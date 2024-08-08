@@ -73,7 +73,11 @@ public class SecurityConfig {
                                 "/api/verifyemail",
                                 "/api/forgotpassword",
                                 "/api/resetpassword",
-                                "/api/courses",
+                                "/api/signup/bloger",
+                                "/api/bloger",
+                                "/api/bloger/{id}",
+                                "/api/category",
+                                "/api/category/{category}",
                                 "/payment/success", "/payment/cancel")
                         .permitAll()
                         .anyRequest().authenticated())

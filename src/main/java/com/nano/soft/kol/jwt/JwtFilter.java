@@ -15,7 +15,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
 import com.nano.soft.kol.user.service.UserDetailsServiceImpl;
 
 @Setter
@@ -26,21 +25,25 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-
     @Override
     public boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         // "/", "/error", "/webjars/**", "/index.html", "/signup", "/signin"
-        return path.startsWith("/webjars") || path.startsWith("/index.html") || path.startsWith("/api/signup") || path.startsWith("/api/verifyemail")
+        return path.startsWith("/webjars") || path.startsWith("/index.html") || path.startsWith("/api/signup")
+                || path.startsWith("/api/verifyemail")
                 || path.startsWith("/api/signin") ||
-                path.equals("/api") || path.equals("/api/welcome.html") 
-                || path.startsWith("/api/refreshtoken") 
+                path.equals("/api") || path.equals("/api/welcome.html")
+                || path.startsWith("/api/refreshtoken")
                 || path.startsWith("/swagger-ui.html") || path.startsWith("/swagger-resources")
                 || path.startsWith("/v2/api-docs") || path.startsWith("/v3/api-docs") ||
-                path.startsWith("/configuration/ui") || path.startsWith("/configuration/security") || path.startsWith("/api/verifyemail")
+                path.startsWith("/configuration/ui") || path.startsWith("/configuration/security")
+                || path.startsWith("/api/verifyemail")
                 || path.startsWith("/swagger-ui") || path.startsWith("/webjars") || path.startsWith("/pay.html")
                 || path.startsWith("/api/forgotpassword") || path.startsWith("/api/resetpassword")
-                || path.startsWith("/api/courses") || path.startsWith("/payment/success") || path.startsWith("/payment/cancel");
+                || path.startsWith("/payment/success") || path.startsWith("/payment/cancel")
+                || path.startsWith("/api/bloger") || path.startsWith("/api/bloger/**")
+                || path.startsWith("/api/bloger/{id}") || path.startsWith("/api/category")
+                || path.startsWith("/api/category/{category}");
     }
 
     @Override
@@ -61,7 +64,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         final String jwt = authHeader.substring(7);
         final String userEmail = jwtService.extractUserName(jwt);
-        
+
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             if (jwtService.validateToken(jwt, userDetails)) {
