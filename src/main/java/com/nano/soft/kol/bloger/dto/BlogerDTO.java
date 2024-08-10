@@ -29,7 +29,6 @@ public class BlogerDTO {
 
     private String password;
 
-    @Pattern(regexp = "^[0-9]{11}$", message = "invalid mobile number entered ")
     @NotNull(message = "phone shouldn't be null")
     private String phone;
 

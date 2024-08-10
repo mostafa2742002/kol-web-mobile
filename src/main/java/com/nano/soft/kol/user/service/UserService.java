@@ -79,8 +79,8 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(loginDTO.getEmail());
         if (user != null && bCryptPasswordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
 
-            if (user.isEmailVerified() == false)
-                throw new IllegalArgumentException("Email not verified");
+            // if (user.isEmailVerified() == false)
+            //     throw new IllegalArgumentException("Email not verified");
 
             userRepository.save(user);
 

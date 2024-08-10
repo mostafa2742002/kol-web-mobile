@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -48,7 +47,6 @@ public class Bloger extends AuditableBase implements UserDetails {
 
     private String password;
 
-    @Pattern(regexp = "^[0-9]{11}$", message = "invalid mobile number entered ")
     @NotNull(message = "phone shouldn't be null")
     private String phone;
 
@@ -58,7 +56,7 @@ public class Bloger extends AuditableBase implements UserDetails {
     private ArrayList<String> notifications = new ArrayList<>();
     private ArrayList<String> requestedCampaign = new ArrayList<>();
     private ArrayList<String> paidCampaign = new ArrayList<>();
-    
+
     @Schema(hidden = true)
     private String token;
     @Schema(hidden = true)
@@ -155,5 +153,13 @@ public class Bloger extends AuditableBase implements UserDetails {
         this.specialization = blogerDTO.getSpecialization();
         this.dateOfBirth = blogerDTO.getDateOfBirth();
         this.language = blogerDTO.getLanguage();
+        this.gender = blogerDTO.getGender();
+        this.maritalStatus = blogerDTO.getMaritalStatus();
+        this.showsFaceInStories = blogerDTO.getShowsFaceInStories();
+        this.usesVoiceInContent = blogerDTO.getUsesVoiceInContent();
+        this.goesInPublicPlaces = blogerDTO.getGoesInPublicPlaces();
+        this.wearsHijab = blogerDTO.getWearsHijab();
+        this.nationality = blogerDTO.getNationality();
     }
+
 }
