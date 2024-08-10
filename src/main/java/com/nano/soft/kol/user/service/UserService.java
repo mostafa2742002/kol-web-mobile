@@ -84,7 +84,7 @@ public class UserService implements UserDetailsService {
 
             userRepository.save(user);
 
-            return new JwtResponse(jwtService.generateToken(user), jwtService.generateRefreshToken(user), user);
+            return new JwtResponse(jwtService.generateToken(user), jwtService.generateRefreshToken(user), user, "user");
         }
 
         Bloger bloger = blogerRepository.findByEmail(loginDTO.getEmail());
@@ -95,7 +95,7 @@ public class UserService implements UserDetailsService {
 
             blogerRepository.save(bloger);
 
-            return new JwtResponse(jwtService.generateToken(bloger), jwtService.generateRefreshToken(bloger), bloger);
+            return new JwtResponse(jwtService.generateToken(bloger), jwtService.generateRefreshToken(bloger), bloger,"bloger");
         }
 
         throw new IllegalArgumentException("Invalid credentials");

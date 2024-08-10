@@ -13,4 +13,5 @@ public class JwtResponse {
     private String token;
     private String refreshToken;
     private Object userOrBloger;
+    private String intent;
 }
