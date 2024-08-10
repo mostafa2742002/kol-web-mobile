@@ -75,13 +75,11 @@ public class BlogerService {
         String subject = "Verify Your Email";
 
         // if we use render site then use this
-        String body = "Click the link to verify your email:https://courses-website-q0gf.onrender.com/api/verifyemail?token="
-                + verificationToken;
+        // String body = "Click the link to verify your email:https://courses-website-q0gf.onrender.com/api/verifyemail?token="
+        //         + verificationToken;
 
         // if we use localhost then use this
-        // String body = "Click the link to verify your
-        // email:http://localhost:8080/api/verifyemail?token="
-        // + verificationToken;
+        String body = "Click the link to verify your email:http://localhost:8080/api/verifyemail?token=" + verificationToken;
         emailService.sendEmail(savedBloger.getEmail(), subject, body);
 
         return "the Bloger added successfully go to your email to verify your email";
