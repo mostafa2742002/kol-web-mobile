@@ -90,8 +90,8 @@ public class UserService implements UserDetailsService {
         Bloger bloger = blogerRepository.findByEmail(loginDTO.getEmail());
         if (bloger != null && bCryptPasswordEncoder.matches(loginDTO.getPassword(), bloger.getPassword())) {
 
-            if (bloger.isEmailVerified() == false)
-                throw new IllegalArgumentException("Email not verified");
+            // if (bloger.isEmailVerified() == false)
+            //     throw new IllegalArgumentException("Email not verified");
 
             blogerRepository.save(bloger);
 
