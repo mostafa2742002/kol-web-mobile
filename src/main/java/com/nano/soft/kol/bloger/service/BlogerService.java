@@ -75,11 +75,13 @@ public class BlogerService {
         String subject = "Verify Your Email";
 
         // if we use render site then use this
-        // String body = "Click the link to verify your email:https://courses-website-q0gf.onrender.com/api/verifyemail?token="
-        //         + verificationToken;
+        // String body = "Click the link to verify your
+        // email:https://courses-website-q0gf.onrender.com/api/verifyemail?token="
+        // + verificationToken;
 
         // if we use localhost then use this
-        String body = "Click the link to verify your email:http://localhost:8080/api/verifyemail?token=" + verificationToken;
+        String body = "Click the link to verify your email:http://localhost:8080/api/verifyemail?token="
+                + verificationToken;
         emailService.sendEmail(savedBloger.getEmail(), subject, body);
 
         return "the Bloger added successfully go to your email to verify your email";
@@ -147,14 +149,14 @@ public class BlogerService {
     }
 
     public ResponseDto responseToClient(String campaignId, Boolean blogerResponse, String content) {
-        if(!campaignRepository.findById(campaignId).isPresent()) {
+        if (!campaignRepository.findById(campaignId).isPresent()) {
             throw new ResourceNotFoundException("Campaign", "Id", campaignId);
         }
         CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
         campaignReq.setBlogerStatus((blogerResponse) ? "Accepted" : "Rejected");
         campaignReq.setContent(content);
 
-        if(!userRepository.findById(campaignReq.getClientId()).isPresent()) {
+        if (!userRepository.findById(campaignReq.getClientId()).isPresent()) {
             throw new ResourceNotFoundException("User", "Id", campaignReq.getClientId());
         }
 
@@ -162,7 +164,7 @@ public class BlogerService {
         // delete the campaign from the user requested campaigns
         user.getRequestedCampaign().remove(campaignId);
         // add the campaign to the user accepted or rejected campaigns
-        if(blogerResponse) {
+        if (blogerResponse) {
             user.getAcceptedCampaign().add(campaignId);
         } else {
             user.getRejectedCampaign().add(campaignId);
@@ -175,10 +177,10 @@ public class BlogerService {
     }
 
     public ResponseDto completeToAdmin(@Valid @NotNull CampaignReq campaignComplete) {
-        if(campaignComplete.getCampaignUrl() == null) {
+        if (campaignComplete.getCampaignUrl() == null) {
             throw new IllegalArgumentException("Campaign URL is required");
         }
-        if(!campaignRepository.findById(campaignComplete.getId()).isPresent()) {
+        if (!campaignRepository.findById(campaignComplete.getId()).isPresent()) {
             throw new ResourceNotFoundException("Campaign", "Id", campaignComplete.getId());
         }
 
@@ -189,10 +191,10 @@ public class BlogerService {
     }
 
     public ResponseDto completeToClient(@Valid @NotNull CampaignReq campaignComplete) {
-        if(campaignComplete.getCampaignUrl() == null) {
+        if (campaignComplete.getCampaignUrl() == null) {
             throw new IllegalArgumentException("Content is required");
         }
-        if(!campaignRepository.findById(campaignComplete.getId()).isPresent()) {
+        if (!campaignRepository.findById(campaignComplete.getId()).isPresent()) {
             throw new ResourceNotFoundException("Campaign", "Id", campaignComplete.getId());
         }
 
@@ -206,6 +208,13 @@ public class BlogerService {
         userRepository.save(user);
 
         return new ResponseDto("200", "Campaign sent to client successfully");
+    }
+
+    public Bloger getProfileBloger(String email) {
+        if (blogerRepository.findByEmail(email) == null) {
+            throw new ResourceNotFoundException("the bloger", "Email", email);
+        }
+        return blogerRepository.findByEmail(email);
     }
 
 }

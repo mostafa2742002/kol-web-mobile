@@ -3,7 +3,7 @@ package com.nano.soft.kol.user.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-
+import java.util.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +14,7 @@ import com.nano.soft.kol.bloger.dto.BlogerDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
 import com.nano.soft.kol.bloger.repo.BlogerRepository;
 import com.nano.soft.kol.email.EmailService;
+import com.nano.soft.kol.exception.ResourceNotFoundException;
 import com.nano.soft.kol.jwt.JwtResponse;
 import com.nano.soft.kol.jwt.JwtService;
 import com.nano.soft.kol.user.dto.LoginDTO;
@@ -215,20 +216,13 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public Object getProfile(String email) {
+    public User getProfileUser(String email) {
 
-        // check if the user is a user or a bloger
-        User user = userRepository.findByEmail(email);
-        if (user != null) {
-            return user;
+        if (userRepository.findByEmail(email) == null) {
+            throw new ResourceNotFoundException("the user", "Email", email);
         }
 
-        Bloger bloger = blogerRepository.findByEmail(email);
-        if (bloger != null) {
-            return bloger;
-        }
-
-        throw new IllegalArgumentException("User not found");
+        return userRepository.findByEmail(email);
     }
 
 }

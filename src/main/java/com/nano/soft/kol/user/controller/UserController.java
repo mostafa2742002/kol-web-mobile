@@ -3,7 +3,7 @@ package com.nano.soft.kol.user.controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -89,8 +89,8 @@ public class UserController {
 
                         )) })
         @GetMapping("/profile")
-        public ResponseEntity<Object> getProfile(@RequestParam String email) {
-                return ResponseEntity.ok(userService.getProfile(email));
+        public ResponseEntity<User> getProfileUser(@RequestParam String email) {
+                return ResponseEntity.ok(userService.getProfileUser(email));
         }
 
         @Operation(summary = "Validate The user email", description = "Validate The user email")

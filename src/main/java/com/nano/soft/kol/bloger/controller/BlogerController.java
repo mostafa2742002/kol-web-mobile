@@ -21,8 +21,15 @@ import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.bloger.entity.CategoryNumber;
 import com.nano.soft.kol.bloger.entity.PageResponse;
 import com.nano.soft.kol.bloger.service.BlogerService;
+import com.nano.soft.kol.dto.ErrorResponseDto;
 import com.nano.soft.kol.dto.ResponseDto;
+import com.nano.soft.kol.user.entity.User;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -61,6 +68,16 @@ public class BlogerController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(blogers);
+    }
+
+    @Operation(summary = "Get bloger profile", description = "Get bloger profile by bloger id")
+    @ApiResponses({ @ApiResponse(responseCode = "200", description = "Profile retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)
+
+            )) })
+    @GetMapping("/profile/bloger")
+    public ResponseEntity<Bloger> getProfileBloger(@RequestParam String email) {
+        return ResponseEntity.ok(blogerService.getProfileBloger(email));
     }
 
     @GetMapping("/category")
