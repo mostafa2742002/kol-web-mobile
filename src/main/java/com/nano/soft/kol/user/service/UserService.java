@@ -34,7 +34,7 @@ public class UserService implements UserDetailsService {
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
     private final EmailService emailService;
-    private final BlogerRepository blogerRepository;    
+    private final BlogerRepository blogerRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -63,16 +63,17 @@ public class UserService implements UserDetailsService {
         String subject = "Verify Your Email";
 
         // if we use render site then use this
-        // String body = "Click the link to verify your email:https://courses-website-q0gf.onrender.com/api/verifyemail?token="
-        //         + verificationToken;
+        // String body = "Click the link to verify your
+        // email:https://courses-website-q0gf.onrender.com/api/verifyemail?token="
+        // + verificationToken;
 
         // if we use localhost then use this
-        String body = "Click the link to verify your email:http://localhost:8080/api/verifyemail?token=" + verificationToken;
+        String body = "Click the link to verify your email:http://localhost:8080/api/verifyemail?token="
+                + verificationToken;
         emailService.sendEmail(savedUser.getEmail(), subject, body);
 
         return "the user added successfully go to your email to verify your email";
     }
-
 
     public JwtResponse login(@NonNull LoginDTO loginDTO) {
         loginDTO.setEmail(loginDTO.getEmail().toLowerCase());
@@ -80,7 +81,7 @@ public class UserService implements UserDetailsService {
         if (user != null && bCryptPasswordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
 
             // if (user.isEmailVerified() == false)
-            //     throw new IllegalArgumentException("Email not verified");
+            // throw new IllegalArgumentException("Email not verified");
 
             userRepository.save(user);
 
@@ -91,11 +92,12 @@ public class UserService implements UserDetailsService {
         if (bloger != null && bCryptPasswordEncoder.matches(loginDTO.getPassword(), bloger.getPassword())) {
 
             // if (bloger.isEmailVerified() == false)
-            //     throw new IllegalArgumentException("Email not verified");
+            // throw new IllegalArgumentException("Email not verified");
 
             blogerRepository.save(bloger);
 
-            return new JwtResponse(jwtService.generateToken(bloger), jwtService.generateRefreshToken(bloger), bloger,"bloger");
+            return new JwtResponse(jwtService.generateToken(bloger), jwtService.generateRefreshToken(bloger), bloger,
+                    "bloger");
         }
 
         throw new IllegalArgumentException("Invalid credentials");
@@ -213,8 +215,20 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public User getProfile(String email) {
-        return userRepository.findByEmail(email);
+    public Object getProfile(String email) {
+
+        // check if the user is a user or a bloger
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            return user;
+        }
+
+        Bloger bloger = blogerRepository.findByEmail(email);
+        if (bloger != null) {
+            return bloger;
+        }
+
+        throw new IllegalArgumentException("User not found");
     }
 
 }
