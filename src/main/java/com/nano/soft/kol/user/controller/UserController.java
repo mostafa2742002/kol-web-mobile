@@ -89,10 +89,7 @@ public class UserController {
 
                         )) })
         @GetMapping("/profile")
-        public ResponseEntity<Object> getProfile() {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                Object principal = authentication.getPrincipal();
-                String email = ((UserDetails) principal).getUsername();
+        public ResponseEntity<Object> getProfile(@RequestParam String email) {
                 return ResponseEntity.ok(userService.getProfile(email));
         }
 
