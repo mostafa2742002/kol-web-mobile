@@ -70,6 +70,15 @@ public class BlogerController {
                 .body(blogers);
     }
 
+    @GetMapping("/bloger/filter")
+    public ResponseEntity<List<Bloger>> getBlogerByFilter(
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "country", required = false) String country,
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(name = "age", required = false) Integer age) {
+        return ResponseEntity.ok(blogerService.getBlogerByFilter(category, country, type, age));
+    }
+
     @Operation(summary = "Get bloger profile", description = "Get bloger profile by bloger id")
     @ApiResponses({ @ApiResponse(responseCode = "200", description = "Profile retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)

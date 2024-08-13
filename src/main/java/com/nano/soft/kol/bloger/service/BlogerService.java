@@ -1,12 +1,18 @@
 package com.nano.soft.kol.bloger.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
 import com.nano.soft.kol.bloger.dto.BlogerDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
-
 import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.bloger.entity.Category;
 import com.nano.soft.kol.bloger.entity.CategoryNumber;
@@ -19,16 +25,6 @@ import com.nano.soft.kol.jwt.JwtService;
 import com.nano.soft.kol.user.entity.User;
 import com.nano.soft.kol.user.repo.CampaignRepository;
 import com.nano.soft.kol.user.repo.UserRepository;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -215,6 +211,32 @@ public class BlogerService {
             throw new ResourceNotFoundException("the bloger", "Email", email);
         }
         return blogerRepository.findByEmail(email);
+    }
+
+    public List<Bloger> getBlogerByFilter(String category, String country, String type, Integer age) {
+        List<Bloger> blogers = blogerRepository.findAll();
+        List<Bloger> filteredBlogers = new ArrayList<>();
+        for (Bloger bloger : blogers) {
+            if (category != null && !bloger.getInterests().contains(Category.valueOf(category))) {
+                continue;
+            }
+            if (country != null && !bloger.getCountryOfResidence().equals(country)) {
+                continue;
+            }
+            if (type != null && !bloger.getGender().equals(type)) {
+                continue;
+            }
+
+            LocalDate birthDate = bloger.getDateOfBirth().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate currentDate = LocalDate.now();
+            int blogerAge = currentDate.getYear() - birthDate.getYear();
+            if (age != null && blogerAge != age) {
+                continue;
+            }
+
+            filteredBlogers.add(bloger);
+        }
+        return filteredBlogers;
     }
 
 }

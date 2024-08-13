@@ -2,6 +2,7 @@ package com.nano.soft.kol.bloger.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -85,7 +86,7 @@ public class Bloger extends AuditableBase implements UserDetails {
     private Integer youtubeFollowers;
     private String career;
     private String specialization;
-    private String dateOfBirth; // Consider using a Date type and appropriate format annotation
+    private Date dateOfBirth; // Consider using a Date type and appropriate format annotation
     private String language;
     private String gender;
     private String maritalStatus;

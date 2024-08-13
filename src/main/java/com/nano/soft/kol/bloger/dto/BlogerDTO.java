@@ -51,7 +51,7 @@ public class BlogerDTO {
     private Integer youtubeFollowers;
     private String career;
     private String specialization;
-    private String dateOfBirth; // Consider using a Date type and appropriate format annotation
+    private Date dateOfBirth; // Consider using a Date type and appropriate format annotation
     private String language;
     private String gender;
     private String maritalStatus;
