@@ -226,12 +226,15 @@ public class BlogerService {
             if (type != null && !bloger.getGender().equals(type)) {
                 continue;
             }
+            if (age == null) {
+                continue;
+            }
             Integer lowerAge = age;
-            Integer upperAge = age+9;
+            Integer upperAge = age + 9;
             LocalDate birthDate = bloger.getDateOfBirth().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate currentDate = LocalDate.now();
             int blogerAge = currentDate.getYear() - birthDate.getYear();
-            if (age != null && (blogerAge < lowerAge || blogerAge > upperAge)) {
+            if (blogerAge < lowerAge || blogerAge > upperAge) {
                 continue;
             }
 
