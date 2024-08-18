@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nano.soft.kol.bloger.dto.BlogerDTO;
+import com.nano.soft.kol.bloger.entity.Bloger;
 import com.nano.soft.kol.constants.ServerConstants;
 import com.nano.soft.kol.dto.ErrorResponseDto;
 import com.nano.soft.kol.dto.ResponseDto;
@@ -165,6 +166,29 @@ public class UserController {
                 return ResponseEntity
                                 .status(HttpStatus.OK)
                                 .body(new ResponseDto(ServerConstants.STATUS_200, ServerConstants.MESSAGE_200));
+        }
+
+        @PostMapping("/favorite")
+        public ResponseEntity<ResponseDto> addFavorite(@RequestParam @NotNull String userId,
+                        @RequestParam @NotNull String blogerId) {
+                userService.addFavorite(userId, blogerId);
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body(new ResponseDto(ServerConstants.STATUS_200, ServerConstants.MESSAGE_200));
+        }
+
+        @DeleteMapping("/favorite")
+        public ResponseEntity<ResponseDto> removeFavorite(@RequestParam @NotNull String userId,
+                        @RequestParam @NotNull String blogerId) {
+                userService.removeFavorite(userId, blogerId);
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body(new ResponseDto(ServerConstants.STATUS_200, ServerConstants.MESSAGE_200));
+        }
+
+        @GetMapping("/favorite")
+        public ResponseEntity<List<Bloger>> getFavorite(@RequestParam @NotNull String userId) {
+                return ResponseEntity.ok(userService.getFavorite(userId));
         }
 
 }

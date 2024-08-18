@@ -225,4 +225,51 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
 
+    public void addFavorite(@NotNull String userId, @NotNull String blogerId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new ResourceNotFoundException("the user", "id", userId);
+        }
+
+        Bloger bloger = blogerRepository.findById(blogerId).orElse(null);
+        if (bloger == null) {
+            throw new ResourceNotFoundException("the bloger", "id", blogerId);
+        }
+
+        user.getFavoriteBlogers().add(blogerId);
+        userRepository.save(user);
+    }
+
+    public void removeFavorite(@NotNull String userId, @NotNull String blogerId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new ResourceNotFoundException("the user", "id", userId);
+        }
+
+        Bloger bloger = blogerRepository.findById(blogerId).orElse(null);
+        if (bloger == null) {
+            throw new ResourceNotFoundException("the bloger", "id", blogerId);
+        }
+
+        user.getFavoriteBlogers().remove(blogerId);
+        userRepository.save(user);
+    }
+
+    public List<Bloger> getFavorite(@NotNull String userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new ResourceNotFoundException("the user", "id", userId);
+        }
+
+        List<Bloger> blogers = new ArrayList<>();
+        for (String blogerId : user.getFavoriteBlogers()) {
+            Bloger bloger = blogerRepository.findById(blogerId).orElse(null);
+            if (bloger != null) {
+                blogers.add(bloger);
+            }
+        }
+
+        return blogers;
+    }
+
 }
