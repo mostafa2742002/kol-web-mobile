@@ -10,7 +10,9 @@ import com.nano.soft.kol.exception.ResourceNotFoundException;
 import com.nano.soft.kol.user.entity.User;
 import com.nano.soft.kol.user.repo.CampaignRepository;
 import com.nano.soft.kol.user.repo.UserRepository;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 
@@ -46,6 +48,40 @@ public class UserCampaignService {
 
         campaignRepository.save(campaignReq);
         return new ResponseDto("201", "Campaign request sent successfully");
+    }
+
+    public ArrayList<String> getRequestedCampaign(@NotNull String userId) {
+        if(!userRepository.findById(userId).isPresent()) {
+            throw new  ResourceNotFoundException("User Id", "Id", userId);
+        }
+        User user = userRepository.findById(userId).get();
+        return user.getRequestedCampaign();
+    }
+
+    public ArrayList<String> getAcceptedCampaign(@NotNull String userId) {
+        if(!userRepository.findById(userId).isPresent()) {
+            throw new  ResourceNotFoundException("User Id", "Id", userId);
+        }
+        User user = userRepository.findById(userId).get();
+        return user.getAcceptedCampaign();
+    }
+
+    public ArrayList<String> getRejectedCampaign(@NotNull String userId) {
+        if(!userRepository.findById(userId).isPresent()) {
+            throw new  ResourceNotFoundException("User Id", "Id", userId);
+        }
+        User user = userRepository.findById(userId).get();
+
+        return user.getRejectedCampaign();
+    }
+
+    public ArrayList<String> getDoneCampaign(@NotNull String userId) {
+        if(!userRepository.findById(userId).isPresent()) {
+            throw new  ResourceNotFoundException("User Id", "Id", userId);
+        }
+        User user = userRepository.findById(userId).get();
+
+        return user.getDoneCampaign();
     }
 
 }

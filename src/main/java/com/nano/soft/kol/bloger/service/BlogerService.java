@@ -243,4 +243,22 @@ public class BlogerService {
         return filteredBlogers;
     }
 
+    public ArrayList<String> getRequestedCampaign(@NotNull String blogerId) {
+        if (!blogerRepository.findById(blogerId).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        }
+
+        Bloger bloger = blogerRepository.findById(blogerId).get();
+        return bloger.getRequestedCampaign();
+    }
+
+    public ArrayList<String> getPaidCampaign(@NotNull String blogerId) {
+        if (!blogerRepository.findById(blogerId).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        }
+
+        Bloger bloger = blogerRepository.findById(blogerId).get();
+        return bloger.getPaidCampaign();
+    }
+
 }

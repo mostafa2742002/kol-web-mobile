@@ -124,4 +124,14 @@ public class BlogerController {
             @RequestBody @Valid @NotNull CampaignReq campaignComplete) {
         return ResponseEntity.ok(blogerService.completeToClient(campaignComplete));
     }
+
+    @GetMapping("/bloger/requested-campaign")
+    public ResponseEntity<ArrayList<String>> getRequestedCampaign(@RequestParam @NotNull String blogerId) {
+        return ResponseEntity.ok(blogerService.getRequestedCampaign(blogerId));
+    }
+
+    @GetMapping("/bloger/paid-campaign")
+    public ResponseEntity<ArrayList<String>> getPaidCampaign(@RequestParam @NotNull String blogerId) {
+        return ResponseEntity.ok(blogerService.getPaidCampaign(blogerId));
+    }
 }

@@ -1,20 +1,24 @@
 package com.nano.soft.kol.user.controller;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.dto.ResponseDto;
 import com.nano.soft.kol.user.service.UserCampaignService;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -33,5 +37,25 @@ public class UserCampaignController {
     @PostMapping("/campaign/request/to-bloger")
     public ResponseEntity<ResponseDto> requestCampaignToBloger(@RequestBody @NotNull CampaignReq campaignReq) {
         return ResponseEntity.ok(userCampaignService.requestCampaignToBloger(campaignReq));
+    }
+
+    @GetMapping("/user/requested-campaign")
+    public ResponseEntity<ArrayList<String>> getRequestedCampaign(@RequestParam @NotNull String userId) {
+        return ResponseEntity.ok(userCampaignService.getRequestedCampaign(userId));
+    }
+
+    @GetMapping("/user/Accepted-campaign")
+    public ResponseEntity<ArrayList<String>> getAcceptedCampaign(@RequestParam @NotNull String userId) {
+        return ResponseEntity.ok(userCampaignService.getAcceptedCampaign(userId));
+    }
+
+    @GetMapping("/user/rejected-campaign")
+    public ResponseEntity<ArrayList<String>> getRejectedCampaign(@RequestParam @NotNull String userId) {
+        return ResponseEntity.ok(userCampaignService.getRejectedCampaign(userId));
+    }
+
+    @GetMapping("/user/done-campaign")
+    public ResponseEntity<ArrayList<String>> getDoneCampaign(@RequestParam @NotNull String userId) {
+        return ResponseEntity.ok(userCampaignService.getDoneCampaign(userId));
     }
 }
