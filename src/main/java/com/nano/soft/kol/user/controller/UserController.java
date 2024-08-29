@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nano.soft.kol.bloger.dto.BlogerDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
+import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.constants.ServerConstants;
 import com.nano.soft.kol.dto.ErrorResponseDto;
 import com.nano.soft.kol.dto.ResponseDto;
@@ -191,4 +192,13 @@ public class UserController {
                 return ResponseEntity.ok(userService.getFavorite(userId));
         }
 
+        @GetMapping("/users")
+        public ResponseEntity<List<User>> getUsers() {
+                return ResponseEntity.ok(userService.getUsers());
+        }
+
+        @GetMapping("/campaigns")
+        public ResponseEntity<List<CampaignReq>> getCampaigns() {
+                return ResponseEntity.ok(userService.getCampaigns());
+        }
 }

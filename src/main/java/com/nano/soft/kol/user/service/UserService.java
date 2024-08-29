@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.nano.soft.kol.bloger.dto.BlogerDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
+import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.bloger.repo.BlogerRepository;
 import com.nano.soft.kol.email.EmailService;
 import com.nano.soft.kol.exception.ResourceNotFoundException;
@@ -20,6 +21,7 @@ import com.nano.soft.kol.jwt.JwtService;
 import com.nano.soft.kol.user.dto.LoginDTO;
 import com.nano.soft.kol.user.dto.UserDTO;
 import com.nano.soft.kol.user.entity.User;
+import com.nano.soft.kol.user.repo.CampaignRepository;
 import com.nano.soft.kol.user.repo.UserRepository;
 
 import jakarta.mail.MessagingException;
@@ -36,6 +38,7 @@ public class UserService implements UserDetailsService {
     private final UserDetailsServiceImpl userDetailsService;
     private final EmailService emailService;
     private final BlogerRepository blogerRepository;
+    private final CampaignRepository campaignRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -270,6 +273,14 @@ public class UserService implements UserDetailsService {
         }
 
         return blogers;
+    }
+
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    public List<CampaignReq> getCampaigns() {
+        return campaignRepository.findAll();
     }
 
 }
