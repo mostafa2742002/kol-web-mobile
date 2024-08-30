@@ -1,16 +1,12 @@
 package com.nano.soft.kol.user.controller;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,16 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nano.soft.kol.bloger.dto.BlogerDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
 import com.nano.soft.kol.bloger.entity.CampaignReq;
+import com.nano.soft.kol.bloger.entity.PageResponse;
 import com.nano.soft.kol.constants.ServerConstants;
 import com.nano.soft.kol.dto.ErrorResponseDto;
 import com.nano.soft.kol.dto.ResponseDto;
 import com.nano.soft.kol.user.dto.LoginDTO;
 import com.nano.soft.kol.user.dto.PasswordDTO;
 import com.nano.soft.kol.user.dto.UserDTO;
-
 import com.nano.soft.kol.user.entity.User;
 import com.nano.soft.kol.user.service.UserService;
 
@@ -193,8 +188,12 @@ public class UserController {
         }
 
         @GetMapping("/users")
-        public ResponseEntity<List<User>> getUsers() {
-                return ResponseEntity.ok(userService.getUsers());
+        // we will user page and size for pagination
+        public ResponseEntity<PageResponse<User>> getUsers(
+                        @RequestParam Optional<Integer> page,
+                        @RequestParam Optional<Integer> size
+        ) {
+                return ResponseEntity.ok(userService.getUsers(page.orElse(0), size.orElse(10)));
         }
 
         @GetMapping("/campaigns")

@@ -1,18 +1,22 @@
 package com.nano.soft.kol.user.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import java.util.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.nano.soft.kol.bloger.dto.BlogerDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
 import com.nano.soft.kol.bloger.entity.CampaignReq;
+import com.nano.soft.kol.bloger.entity.PageResponse;
 import com.nano.soft.kol.bloger.repo.BlogerRepository;
 import com.nano.soft.kol.email.EmailService;
 import com.nano.soft.kol.exception.ResourceNotFoundException;
@@ -25,7 +29,6 @@ import com.nano.soft.kol.user.repo.CampaignRepository;
 import com.nano.soft.kol.user.repo.UserRepository;
 
 import jakarta.mail.MessagingException;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 
@@ -275,8 +278,20 @@ public class UserService implements UserDetailsService {
         return blogers;
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public PageResponse<User> getUsers(int page, int size) {
+        Page<User> users = userRepository.findAll(PageRequest.of(page, size));
+
+        PageResponse<User> pageResponse = new PageResponse<>();
+        pageResponse.setContent(users.getContent());
+        pageResponse.setNumber(users.getNumber());
+        pageResponse.setSize(users.getSize());
+        pageResponse.setTotalElements(users.getTotalElements());
+        pageResponse.setTotalPages(users.getTotalPages());
+        pageResponse.setFirst(users.isFirst());
+        pageResponse.setLast(users.isLast());
+
+        return pageResponse;
+
     }
 
     public List<CampaignReq> getCampaigns() {
