@@ -95,7 +95,7 @@ public class Bloger extends AuditableBase implements UserDetails {
     private Boolean goesInPublicPlaces;
     private Boolean wearsHijab;
     private String nationality;
-    private ArrayList<Category> interests;
+    private ArrayList<String> interests;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -161,6 +161,7 @@ public class Bloger extends AuditableBase implements UserDetails {
         this.goesInPublicPlaces = blogerDTO.getGoesInPublicPlaces();
         this.wearsHijab = blogerDTO.getWearsHijab();
         this.nationality = blogerDTO.getNationality();
+        // this.interests = blogerDTO.getInterests();
     }
 
 }

@@ -18,7 +18,7 @@ public interface BlogerRepository extends MongoRepository<Bloger, String> {
 
     Bloger findById(int id);
 
-    Page<Bloger> findByInterests(Category interest, Pageable pageable);
+    Page<Bloger> findByInterests(String interest_id, Pageable pageable);
 
     Optional<Bloger> findByName(String name);
 

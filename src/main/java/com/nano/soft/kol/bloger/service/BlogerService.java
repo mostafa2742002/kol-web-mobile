@@ -18,6 +18,7 @@ import com.nano.soft.kol.bloger.entity.Category;
 import com.nano.soft.kol.bloger.entity.CategoryNumber;
 import com.nano.soft.kol.bloger.entity.PageResponse;
 import com.nano.soft.kol.bloger.repo.BlogerRepository;
+import com.nano.soft.kol.bloger.repo.CategoryRepository;
 import com.nano.soft.kol.dto.ResponseDto;
 import com.nano.soft.kol.email.EmailService;
 import com.nano.soft.kol.exception.ResourceNotFoundException;
@@ -41,6 +42,7 @@ public class BlogerService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
     public String registerBloger(@Valid @NotNull BlogerDTO blogerDTO) throws MessagingException, InterruptedException {
         if (blogerRepository.findByEmail(blogerDTO.getEmail()) != null) {
@@ -49,14 +51,15 @@ public class BlogerService {
 
         blogerDTO.setEmail(blogerDTO.getEmail().toLowerCase());
         Bloger bloger = new Bloger(blogerDTO);
-        ArrayList<Category> category = new ArrayList<>();
-        for (int i = 0; i < blogerDTO.getInterests().size(); i++) {
-            String name = blogerDTO.getInterests().get(i).toLowerCase();
-            // make the first letter of the category name capital
-            name = name.substring(0, 1).toUpperCase() + name.substring(1);
-            category.add(Category.valueOf(name));
+
+        List<Category> categories = categoryRepository.findAll();
+        for (String interest : blogerDTO.getInterests()) {
+            if (categories.stream().noneMatch(c -> c.getName().equals(interest))) {
+                throw new IllegalArgumentException("Category not found");
+            }
         }
-        bloger.setInterests(category);
+        blogerDTO.getInterests().add("General");
+        bloger.setInterests(blogerDTO.getInterests());
 
         String verificationToken = jwtService.generateToken(bloger);
 
@@ -110,9 +113,9 @@ public class BlogerService {
     public ArrayList<CategoryNumber> getCategories() {
         ArrayList<CategoryNumber> categories = new ArrayList<>();
         ArrayList<Bloger> blogers = (ArrayList<Bloger>) blogerRepository.findAll();
-        HashMap<Category, Integer> categoryMap = new HashMap<>();
+        HashMap<String, Integer> categoryMap = new HashMap<>();
         for (Bloger bloger : blogers) {
-            for (Category category : bloger.getInterests()) {
+            for (String category : bloger.getInterests()) {
                 categoryMap.put(category, categoryMap.getOrDefault(category, 0) + 1);
             }
         }
@@ -120,16 +123,19 @@ public class BlogerService {
     }
 
     public PageResponse<Bloger> getBlogersByCategory(String category, int page, int size) {
-        // Convert the category string to the Category enum
-        Category categoryEnum;
-        try {
-            categoryEnum = Category.valueOf(category);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid category: " + category);
+
+        // Validate the category
+
+        List<Category> categories = categoryRepository.findAll();
+        if (categories.stream().noneMatch(c -> c.getName().equals(category))) {
+            throw new IllegalArgumentException("Category not found");
         }
 
+        // Get the category id
+        String category_id = categories.stream().filter(c -> c.getName().equals(category)).findFirst().get().getId();
+
         // Fetch the paginated list of bloggers by category
-        Page<Bloger> blogerPage = blogerRepository.findByInterests(categoryEnum, PageRequest.of(page, size));
+        Page<Bloger> blogerPage = blogerRepository.findByInterests(category_id, PageRequest.of(page, size));
 
         // Map the Page<Bloger> to PageResponse<Bloger>
         PageResponse<Bloger> response = new PageResponse<>();
@@ -216,8 +222,13 @@ public class BlogerService {
     public List<Bloger> getBlogerByFilter(String category, String country, String type, Integer age) {
         List<Bloger> blogers = blogerRepository.findAll();
         List<Bloger> filteredBlogers = new ArrayList<>();
+        Category category_id = categoryRepository.findByName(category);
+        if (category_id == null) {
+            throw new IllegalArgumentException("Category not found");
+        }
+
         for (Bloger bloger : blogers) {
-            if (category != null && !bloger.getInterests().contains(Category.valueOf(category))) {
+            if (category != null && !bloger.getInterests().contains(category_id.getId())) {
                 continue;
             }
             if (country != null && !bloger.getCountryOfResidence().equals(country)) {
