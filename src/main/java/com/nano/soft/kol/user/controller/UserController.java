@@ -119,7 +119,7 @@ public class UserController {
                         )) })
 
         @PutMapping("/profile")
-        public ResponseEntity<String> updateProfile(@RequestBody @NotNull UserDTO user, @RequestParam String user_id) {
+        public ResponseEntity<?> updateProfile(@RequestBody @NotNull UserDTO user, @RequestParam String user_id) {
                 return userService.updateProfile(user, user_id);
         }
 

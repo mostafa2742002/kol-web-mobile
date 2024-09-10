@@ -53,6 +53,8 @@ public class Bloger extends AuditableBase implements UserDetails {
 
     private String image;
 
+    private Integer price;
+
     @Schema(hidden = true)
     private ArrayList<String> notifications = new ArrayList<>();
     private ArrayList<String> requestedCampaign = new ArrayList<>();
@@ -161,6 +163,7 @@ public class Bloger extends AuditableBase implements UserDetails {
         this.goesInPublicPlaces = blogerDTO.getGoesInPublicPlaces();
         this.wearsHijab = blogerDTO.getWearsHijab();
         this.nationality = blogerDTO.getNationality();
+        this.price = blogerDTO.getPrice();
         // this.interests = blogerDTO.getInterests();
     }
 

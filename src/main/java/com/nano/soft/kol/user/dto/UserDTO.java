@@ -21,19 +21,22 @@ public class UserDTO {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
-    private String name;
+    private String fullname;
 
-    private String first_name;
-    private String last_name;
+    private String username;
+    private String city;
+    private String country;
 
     private String phone;
 
     public UserDTO(User user) {
         this.email = user.getEmail();
         this.password = user.getPassword();
-        this.name = user.getName();
+        this.fullname = user.getFullname();
+        this.username = user.getUsername();
+        this.city = user.getCity();
+        this.country = user.getCountry();
         this.phone = user.getPhone();
-        this.first_name = user.getFirst_name();
-        this.last_name = user.getLast_name();
+        
     }
 }

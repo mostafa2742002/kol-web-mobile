@@ -34,10 +34,11 @@ public class User extends AuditableBase implements UserDetails {
 
     @NotNull(message = "username shouldn't be null")
     @Pattern(regexp = "^[a-zA-Z0-9 ]{3,30}$", message = "username must be between 3 and 30 characters long and can only contain letters and numbers")
-    private String name;
+    private String fullname;
 
-    private String first_name;
-    private String last_name;
+    private String username;
+    private String city;
+    private String country;
 
     @Email(message = "invalid email address")
     @NotNull(message = "email shouldn't be null")
@@ -48,6 +49,7 @@ public class User extends AuditableBase implements UserDetails {
     @Pattern(regexp = "^[0-9]{11}$", message = "invalid mobile number entered ")
     @NotNull(message = "phone shouldn't be null")
     private String phone;
+
 
     private String image;
     
@@ -70,11 +72,12 @@ public class User extends AuditableBase implements UserDetails {
 
     public User(UserDTO userDTO) {
         this.email = userDTO.getEmail();
-        this.name = userDTO.getName();
+        this.username = userDTO.getUsername();
         this.password = userDTO.getPassword();
         this.phone = userDTO.getPhone();
-        this.first_name = userDTO.getFirst_name();
-        this.last_name = userDTO.getLast_name();
+        this.fullname = userDTO.getFullname();
+        this.city = userDTO.getCity();
+        this.country = userDTO.getCountry();
     }
 
     @Override

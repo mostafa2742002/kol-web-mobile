@@ -151,15 +151,21 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public ResponseEntity<String> updateProfile(UserDTO user, String user_id) {
+    public ResponseEntity<?> updateProfile(UserDTO user, String user_id) {
 
         User user1 = userRepository.findById(user_id).orElse(null);
 
         if (user1 == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        if (user.getName() != null)
-            user1.setName(user.getName());
+        if (user.getFullname() != null)
+            user1.setFullname(user.getFullname());
+        if (user.getUsername() != null)
+            user1.setUsername(user.getUsername());
+        if (user.getCity() != null)
+            user1.setCity(user.getCity());
+        if (user.getCountry() != null)
+            user1.setCountry(user.getCountry());
         if (user.getPhone() != null)
             user1.setPhone(user.getPhone());
         if (user.getEmail() != null)
@@ -167,7 +173,7 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user1);
 
-        return ResponseEntity.ok("Profile updated successfully");
+        return ResponseEntity.ok(user1);
     }
 
     public ResponseEntity<String> updatePassword(String user_id, String oldPassword, String newPassword) {

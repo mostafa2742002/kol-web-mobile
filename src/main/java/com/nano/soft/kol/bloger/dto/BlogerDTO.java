@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import java.util.*;
+
+import com.fasterxml.jackson.databind.ser.std.StdArraySerializers.IntArraySerializer;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,6 +34,8 @@ public class BlogerDTO {
 
     @NotNull(message = "phone shouldn't be null")
     private String phone;
+
+    private Integer price;
 
     private String image;
 
