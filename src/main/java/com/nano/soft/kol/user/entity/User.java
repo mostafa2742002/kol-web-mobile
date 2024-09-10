@@ -49,10 +49,6 @@ public class User extends AuditableBase implements UserDetails {
     @NotNull(message = "phone shouldn't be null")
     private String phone;
 
-    @Pattern(regexp = "^[0-9]{11}$", message = "invalid mobile number entered ")
-    @NotNull(message = "phone shouldn't be null")
-    private String parentPhone;
-
     private String image;
     
     @Schema(hidden = true)
@@ -77,7 +73,6 @@ public class User extends AuditableBase implements UserDetails {
         this.name = userDTO.getName();
         this.password = userDTO.getPassword();
         this.phone = userDTO.getPhone();
-        this.parentPhone = userDTO.getParentPhone();
         this.first_name = userDTO.getFirst_name();
         this.last_name = userDTO.getLast_name();
     }

@@ -1,3 +1,3 @@
 #!/bin/bash
-mvn compile jib:dockerBuild
-docker push docker.io/sasa274/kol:v1
+docker build -t sasa274/kol:2 .
+docker push docker.io/sasa274/kol:2

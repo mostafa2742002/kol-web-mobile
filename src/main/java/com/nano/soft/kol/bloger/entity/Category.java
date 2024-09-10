@@ -22,4 +22,5 @@ public class Category {
     @NotNull(message = "category name shouldn't be null")
     private String name;
     
+    private String image;
 }

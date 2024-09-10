@@ -119,6 +119,13 @@ public class BlogerService {
                 categoryMap.put(category, categoryMap.getOrDefault(category, 0) + 1);
             }
         }
+        for (String category : categoryMap.keySet()) {
+            List<Category> categoriesList = categoryRepository.findAll();
+            String image = categoriesList.stream().filter(c -> c.getName().equals(category)).findFirst().get().getImage();
+            categories.add(new CategoryNumber(category, categoryMap.get(category), image));
+        }
+
+
         return categories;
     }
 

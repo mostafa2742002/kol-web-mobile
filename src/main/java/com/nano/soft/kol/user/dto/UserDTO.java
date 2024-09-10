@@ -28,14 +28,11 @@ public class UserDTO {
 
     private String phone;
 
-    private String parentPhone;
-
     public UserDTO(User user) {
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.name = user.getName();
         this.phone = user.getPhone();
-        this.parentPhone = user.getParentPhone();
         this.first_name = user.getFirst_name();
         this.last_name = user.getLast_name();
     }
