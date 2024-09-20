@@ -125,10 +125,10 @@ public class BlogerService {
         }
         for (String category : categoryMap.keySet()) {
             List<Category> categoriesList = categoryRepository.findAll();
-            String image = categoriesList.stream().filter(c -> c.getName().equals(category)).findFirst().get().getImage();
+            String image = categoriesList.stream().filter(c -> c.getName().equals(category)).findFirst().get()
+                    .getImage();
             categories.add(new CategoryNumber(category, categoryMap.get(category), image));
         }
-
 
         return categories;
     }
@@ -281,6 +281,32 @@ public class BlogerService {
 
         Bloger bloger = blogerRepository.findById(blogerId).get();
         return bloger.getPaidCampaign();
+    }
+
+    public void rejectedToBloger(@Valid @NotNull CampaignReq campaignRejected) {
+        if (!campaignRepository.findById(campaignRejected.getId()).isPresent()) {
+            throw new ResourceNotFoundException("Campaign", "Id", campaignRejected.getId());
+        }
+
+        CampaignReq campaignReq = campaignRepository.findById(campaignRejected.getId()).get();
+        campaignReq.setAdminApprovalBloger(false);
+        campaignRepository.save(campaignReq);
+    }
+
+    public ArrayList<CampaignReq> getRejectedCampaign(@NotNull String blogerId) {
+        if (!blogerRepository.findById(blogerId).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        }
+
+        Bloger bloger = blogerRepository.findById(blogerId).get();
+        ArrayList<CampaignReq> rejectedCampaigns = new ArrayList<>();
+        for (String campaignId : bloger.getRejectedCampaign()) {
+            if (!campaignRepository.findById(campaignId).isPresent()) {
+                throw new ResourceNotFoundException("Campaign", "Id", campaignId);
+            }
+            rejectedCampaigns.add(campaignRepository.findById(campaignId).get());
+        }
+        return rejectedCampaigns;
     }
 
 }
