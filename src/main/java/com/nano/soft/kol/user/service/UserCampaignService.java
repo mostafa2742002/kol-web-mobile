@@ -1,5 +1,7 @@
 package com.nano.soft.kol.user.service;
 
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Service;
 
 import com.nano.soft.kol.bloger.entity.Bloger;
@@ -10,9 +12,7 @@ import com.nano.soft.kol.exception.ResourceNotFoundException;
 import com.nano.soft.kol.user.entity.User;
 import com.nano.soft.kol.user.repo.CampaignRepository;
 import com.nano.soft.kol.user.repo.UserRepository;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 
@@ -26,6 +26,9 @@ public class UserCampaignService {
 
     public ResponseDto requestCampaign(@NotNull CampaignReq campaignReq) {
         
+        if(!userRepository.findById(campaignReq.getClientId()).isPresent()) {
+            throw new  ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
+        }
         campaignRepository.save(campaignReq);
         return new ResponseDto("201", "Campaign request sent successfully");
     }
@@ -82,6 +85,11 @@ public class UserCampaignService {
         User user = userRepository.findById(userId).get();
 
         return user.getDoneCampaign();
+    }
+
+    public ArrayList<CampaignReq> getAdminRequestedCampaign() {
+        // we will get all campaign that the adminapprovalclient is false
+        return campaignRepository.findByAdminApprovalClient(false);
     }
 
 }

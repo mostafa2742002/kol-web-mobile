@@ -1,19 +1,19 @@
 package com.nano.soft.kol.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtService {
@@ -30,13 +30,10 @@ public class JwtService {
     }
 
     public Boolean isTokenExpired(String token) {
-        DecodedJWT jwt = JWT.decode(token);
-        return jwt.getExpiresAt().before(new Date());
+        return false; // التوكين صالح مدى الحياة
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        if (isTokenExpired(token))
-            return false;
         final String username = extractUserName(token);
         return (username.equals(userDetails.getUsername()));
     }
@@ -51,7 +48,6 @@ public class JwtService {
     }
 
     public Key getSigningKey() {
-
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -66,8 +62,7 @@ public class JwtService {
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 Day
+                .setIssuedAt(new Date(System.currentTimeMillis())) // يتم تعيين وقت الإصدار فقط
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -81,8 +76,7 @@ public class JwtService {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // 7 Days
+                .setIssuedAt(new Date(System.currentTimeMillis())) // يتم تعيين وقت الإصدار فقط
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

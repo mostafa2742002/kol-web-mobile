@@ -1,17 +1,14 @@
 package com.nano.soft.kol.bloger.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.nano.soft.kol.bloger.entity.Category;
 import com.nano.soft.kol.bloger.repo.BlogerRepository;
 import com.nano.soft.kol.bloger.repo.CategoryRepository;
-import com.nano.soft.kol.bloger.entity.Category;
-import com.nano.soft.kol.bloger.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryService {

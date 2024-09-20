@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     public boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         // "/", "/error", "/webjars/**", "/index.html", "/signup", "/signin"
-        return path.startsWith("/webjars") || path.startsWith("/index.html") || path.startsWith("/api/signup")
+        return path.startsWith("/webjars") || path.startsWith("/index.html") || path.startsWith("/api/signup/bloger") || path.startsWith("/api/signup/user") 
                 || path.startsWith("/api/verifyemail")
                 || path.startsWith("/api/signin") ||
                 path.equals("/api") || path.equals("/api/welcome.html")
@@ -43,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.startsWith("/payment/success") || path.startsWith("/payment/cancel")
                 || path.startsWith("/api/bloger") || path.startsWith("/api/bloger/**")
                 || path.startsWith("/api/bloger/{id}") || path.startsWith("/api/category")
-                || path.startsWith("/api/category/{category}");
+                || path.startsWith("/api/category/{category}") || path.startsWith("/api/categories");
     }
 
     @Override
@@ -63,6 +63,13 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         final String jwt = authHeader.substring(7);
+
+        if(jwtService.isTokenExpired(jwt)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token has expired");
+            System.out.println("JWT Token has expired" + jwt + " " + jwtService.isTokenExpired(jwt)); 
+            return;
+        }
+
         final String userEmail = jwtService.extractUserName(jwt);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

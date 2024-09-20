@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.user.dto.UserDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,7 +35,7 @@ public class User extends AuditableBase implements UserDetails {
     @Pattern(regexp = "^[a-zA-Z0-9 ]{3,30}$", message = "username must be between 3 and 30 characters long and can only contain letters and numbers")
     private String fullname;
 
-    private String username;
+    private String name;
     private String city;
     private String country;
 
@@ -72,7 +71,7 @@ public class User extends AuditableBase implements UserDetails {
 
     public User(UserDTO userDTO) {
         this.email = userDTO.getEmail();
-        this.username = userDTO.getUsername();
+        this.name = userDTO.getUsername();
         this.password = userDTO.getPassword();
         this.phone = userDTO.getPhone();
         this.fullname = userDTO.getFullname();

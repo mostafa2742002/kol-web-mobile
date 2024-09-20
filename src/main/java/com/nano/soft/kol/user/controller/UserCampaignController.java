@@ -1,5 +1,7 @@
 package com.nano.soft.kol.user.controller;
 
+import java.util.ArrayList;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,10 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.dto.ResponseDto;
 import com.nano.soft.kol.user.service.UserCampaignService;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -37,6 +35,11 @@ public class UserCampaignController {
     @PostMapping("/campaign/request/to-bloger")
     public ResponseEntity<ResponseDto> requestCampaignToBloger(@RequestBody @NotNull CampaignReq campaignReq) {
         return ResponseEntity.ok(userCampaignService.requestCampaignToBloger(campaignReq));
+    }
+
+    @GetMapping("/admin/campaign/to-bloger")
+    public ResponseEntity<ArrayList<CampaignReq>> getAdminRequestedCampaign() {
+        return ResponseEntity.ok(userCampaignService.getAdminRequestedCampaign());
     }
 
     @GetMapping("/user/requested-campaign")

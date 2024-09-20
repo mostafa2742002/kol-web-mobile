@@ -55,6 +55,11 @@ public class UserService implements UserDetailsService {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
             throw new IllegalArgumentException("User already exists");
         }
+
+        if (blogerRepository.findByEmail(userDTO.getEmail()) != null) {
+            throw new IllegalArgumentException("You are already a bloger");
+        }
+        
         userDTO.setEmail(userDTO.getEmail().toLowerCase());
         User user = new User(userDTO);
         String verificationToken = jwtService.generateToken(user);
@@ -161,7 +166,7 @@ public class UserService implements UserDetailsService {
         if (user.getFullname() != null)
             user1.setFullname(user.getFullname());
         if (user.getUsername() != null)
-            user1.setUsername(user.getUsername());
+            user1.setName(user.getUsername());
         if (user.getCity() != null)
             user1.setCity(user.getCity());
         if (user.getCountry() != null)
@@ -248,6 +253,9 @@ public class UserService implements UserDetailsService {
             throw new ResourceNotFoundException("the bloger", "id", blogerId);
         }
 
+        if (user.getFavoriteBlogers().contains(blogerId)) {
+            throw new IllegalArgumentException("Bloger already in favorite");
+        }
         user.getFavoriteBlogers().add(blogerId);
         userRepository.save(user);
     }
@@ -261,6 +269,10 @@ public class UserService implements UserDetailsService {
         Bloger bloger = blogerRepository.findById(blogerId).orElse(null);
         if (bloger == null) {
             throw new ResourceNotFoundException("the bloger", "id", blogerId);
+        }
+
+        if (!user.getFavoriteBlogers().contains(blogerId)) {
+            throw new IllegalArgumentException("Bloger not in favorite");
         }
 
         user.getFavoriteBlogers().remove(blogerId);

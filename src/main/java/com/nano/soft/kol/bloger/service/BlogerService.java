@@ -49,6 +49,10 @@ public class BlogerService {
             throw new IllegalArgumentException("Bloger already exists");
         }
 
+        if (userRepository.findByEmail(blogerDTO.getEmail()) != null) {
+            throw new IllegalArgumentException("You are already registered as a user");
+        }
+
         blogerDTO.setEmail(blogerDTO.getEmail().toLowerCase());
         Bloger bloger = new Bloger(blogerDTO);
 
