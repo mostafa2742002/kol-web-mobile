@@ -1,6 +1,7 @@
 package com.nano.soft.kol.user.service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -25,26 +26,51 @@ public class UserCampaignService {
     private final UserRepository userRepository;
 
     public ResponseDto requestCampaign(@NotNull CampaignReq campaignReq) {
-        
-        if(!userRepository.findById(campaignReq.getClientId()).isPresent()) {
-            throw new  ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
+
+        if (!userRepository.findById(campaignReq.getClientId()).isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
         }
         campaignRepository.save(campaignReq);
+
+        Optional<User> user = userRepository.findById(campaignReq.getClientId());
+        if (!user.isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
+        }
+
+        user.get().getRequestedCampaign().add(campaignReq.getId());
+        userRepository.save(user.get());
+
         return new ResponseDto("201", "Campaign request sent successfully");
     }
 
     public ResponseDto requestCampaignToBloger(@NotNull CampaignReq campaignReq) {
-        campaignReq.setAdminApprovalClient(true);
-        if(!blogerRepository.findById(campaignReq.getBlogerId()).isPresent()) {
-            throw new  ResourceNotFoundException("Bloger Id", "Id", campaignReq.getBlogerId());
+        System.out.println(2);
+        if (!campaignReq.getAdminApprovalClient()) {
+            System.out.println(1);
+            if (userRepository.findById(campaignReq.getClientId()).isPresent()) {
+                throw new ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
+            }
+            User user = userRepository.findById(campaignReq.getClientId()).get();
+            user.getRejectedCampaign().add(campaignReq.getId());
+            userRepository.save(user);
+            return new ResponseDto("201", "Campaign request sent successfully");
         }
+
+        if (!blogerRepository.findById(campaignReq.getBlogerId()).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", campaignReq.getBlogerId());
+        }
+
         Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
+        System.out.println(campaignReq.getBlogerId());
+        System.out.println(campaignReq.getId());
+        
         bloger.getRequestedCampaign().add(campaignReq.getId());
         blogerRepository.save(bloger);
-
-        if(userRepository.findById(campaignReq.getClientId()).isPresent()) {
-            throw new  ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
+        if (!userRepository.findById(campaignReq.getClientId()).isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
         }
+
+
         User user = userRepository.findById(campaignReq.getClientId()).get();
         user.getRequestedCampaign().add(campaignReq.getId());
         userRepository.save(user);
@@ -53,38 +79,59 @@ public class UserCampaignService {
         return new ResponseDto("201", "Campaign request sent successfully");
     }
 
-    public ArrayList<String> getRequestedCampaign(@NotNull String userId) {
-        if(!userRepository.findById(userId).isPresent()) {
-            throw new  ResourceNotFoundException("User Id", "Id", userId);
+    public ArrayList<CampaignReq> getRequestedCampaign(@NotNull String userId) {
+        if (!userRepository.findById(userId).isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", userId);
         }
         User user = userRepository.findById(userId).get();
-        return user.getRequestedCampaign();
+        ArrayList<CampaignReq> requestedCampaign = new ArrayList<>();
+        for (String campaignId : user.getRequestedCampaign()) {
+            if (campaignRepository.findById(campaignId).isPresent())
+                requestedCampaign.add(campaignRepository.findById(campaignId).get());
+        }
+        return requestedCampaign;
     }
 
-    public ArrayList<String> getAcceptedCampaign(@NotNull String userId) {
-        if(!userRepository.findById(userId).isPresent()) {
-            throw new  ResourceNotFoundException("User Id", "Id", userId);
+    public ArrayList<CampaignReq> getAcceptedCampaign(@NotNull String userId) {
+        if (!userRepository.findById(userId).isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", userId);
         }
         User user = userRepository.findById(userId).get();
-        return user.getAcceptedCampaign();
+        ArrayList<CampaignReq> acceptedCampaign = new ArrayList<>();
+        for (String campaignId : user.getAcceptedCampaign()) {
+            if (campaignRepository.findById(campaignId).isPresent())
+                acceptedCampaign.add(campaignRepository.findById(campaignId).get());
+        }
+        return acceptedCampaign;
     }
 
-    public ArrayList<String> getRejectedCampaign(@NotNull String userId) {
-        if(!userRepository.findById(userId).isPresent()) {
-            throw new  ResourceNotFoundException("User Id", "Id", userId);
+    public ArrayList<CampaignReq> getRejectedCampaign(@NotNull String userId) {
+        if (!userRepository.findById(userId).isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", userId);
         }
         User user = userRepository.findById(userId).get();
 
-        return user.getRejectedCampaign();
+        ArrayList<CampaignReq> rejectedCampaign = new ArrayList<>();
+        for (String campaignId : user.getRejectedCampaign()) {
+            if (campaignRepository.findById(campaignId).isPresent())
+                rejectedCampaign.add(campaignRepository.findById(campaignId).get());
+        }
+        return rejectedCampaign;
     }
 
-    public ArrayList<String> getDoneCampaign(@NotNull String userId) {
-        if(!userRepository.findById(userId).isPresent()) {
-            throw new  ResourceNotFoundException("User Id", "Id", userId);
+    public ArrayList<CampaignReq> getDoneCampaign(@NotNull String userId) {
+        if (!userRepository.findById(userId).isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", userId);
         }
         User user = userRepository.findById(userId).get();
 
-        return user.getDoneCampaign();
+        ArrayList<CampaignReq> doneCampaign = new ArrayList<>();
+        for (String campaignId : user.getDoneCampaign()) {
+            if (campaignRepository.findById(campaignId).isPresent())
+                doneCampaign.add(campaignRepository.findById(campaignId).get());
+        }
+
+        return doneCampaign;
     }
 
     public ArrayList<CampaignReq> getAdminRequestedCampaign() {

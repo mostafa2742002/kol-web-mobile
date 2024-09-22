@@ -105,10 +105,21 @@ public class BlogerController {
 
     @PostMapping("/campaign/response/to-client")
     public ResponseEntity<ResponseDto> responseToClient(
+            @RequestBody CampaignReq campaignComplete) {
+        return ResponseEntity.ok(blogerService.responseToClient(campaignComplete));
+    }
+
+    @PostMapping("/campaign/response/to-admin")
+    public ResponseEntity<ResponseDto> responseToAdmin(
             @RequestParam(name = "campaignId") String campaignId,
             @RequestParam(name = "blogerResponse") Boolean BlogerResponse,
             @RequestParam(name = "content") String content) {
-        return ResponseEntity.ok(blogerService.responseToClient(campaignId, BlogerResponse, content));
+        return ResponseEntity.ok(blogerService.responseToAdmin(campaignId, BlogerResponse, content));
+    }
+
+    @GetMapping("/campaign/admin/response")
+    public ResponseEntity<ArrayList<CampaignReq>> getCampaignsAdminResponse() {
+        return ResponseEntity.ok(blogerService.getCampaignsAdminResponse());
     }
 
     @PostMapping("/campaign/complete/to-admin")
@@ -120,7 +131,7 @@ public class BlogerController {
     @PostMapping("/campaign/rejected/to-bloger")
     public ResponseEntity<ResponseDto> rejectedToBloger(
             @RequestBody @Valid @NotNull CampaignReq campaignRejected) {
-                blogerService.rejectedToBloger(campaignRejected);
+        blogerService.rejectedToBloger(campaignRejected);
         return ResponseEntity.ok(new ResponseDto("200", "Campaign return to bloger successfully"));
     }
 
@@ -136,7 +147,7 @@ public class BlogerController {
     }
 
     @GetMapping("/bloger/requested-campaign")
-    public ResponseEntity<ArrayList<String>> getRequestedCampaign(@RequestParam @NotNull String blogerId) {
+    public ResponseEntity<ArrayList<CampaignReq>> getRequestedCampaign(@RequestParam @NotNull String blogerId) {
         return ResponseEntity.ok(blogerService.getRequestedCampaign(blogerId));
     }
 

@@ -161,19 +161,15 @@ public class BlogerService {
         return response;
     }
 
-    public ResponseDto responseToClient(String campaignId, Boolean blogerResponse, String content) {
-        if (!campaignRepository.findById(campaignId).isPresent()) {
-            throw new ResourceNotFoundException("Campaign", "Id", campaignId);
-        }
-        CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
-        campaignReq.setBlogerStatus((blogerResponse) ? "Accepted" : "Rejected");
-        campaignReq.setContent(content);
-
+    public ResponseDto responseToClient(CampaignReq campaignReq) {
         if (!userRepository.findById(campaignReq.getClientId()).isPresent()) {
             throw new ResourceNotFoundException("User", "Id", campaignReq.getClientId());
         }
 
         User user = userRepository.findById(campaignReq.getClientId()).get();
+        String campaignId = campaignReq.getId();
+        boolean blogerResponse = campaignReq.getBlogerStatus().equals("Accepted");
+        
         // delete the campaign from the user requested campaigns
         user.getRequestedCampaign().remove(campaignId);
         // add the campaign to the user accepted or rejected campaigns
@@ -185,6 +181,25 @@ public class BlogerService {
 
         userRepository.save(user);
         campaignRepository.save(campaignReq);
+        return new ResponseDto("200", "Response sent successfully");
+    }
+
+    public ResponseDto responseToAdmin(String campaignId, Boolean blogerResponse, String content) {
+        if (!campaignRepository.findById(campaignId).isPresent()) {
+            throw new ResourceNotFoundException("Campaign", "Id", campaignId);
+        }
+
+        
+        
+        
+        CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
+        campaignReq.setBlogerStatus((blogerResponse) ? "Accepted" : "Rejected");
+        campaignReq.setContent(content);
+        campaignRepository.save(campaignReq);
+
+        Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
+        // we will remove the campaign from the bloger's requested campaign
+        bloger.getRequestedCampaign().remove(campaignId);
 
         return new ResponseDto("200", "Response sent successfully");
     }
@@ -265,13 +280,20 @@ public class BlogerService {
         return filteredBlogers;
     }
 
-    public ArrayList<String> getRequestedCampaign(@NotNull String blogerId) {
+    public ArrayList<CampaignReq> getRequestedCampaign(@NotNull String blogerId) {
         if (!blogerRepository.findById(blogerId).isPresent()) {
             throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
         }
 
         Bloger bloger = blogerRepository.findById(blogerId).get();
-        return bloger.getRequestedCampaign();
+        ArrayList<CampaignReq> campaignReqs = new ArrayList<>();
+        for (String campaignId : bloger.getRequestedCampaign()) {
+            if(!campaignRepository.findById(campaignId).isPresent()) {
+                continue;
+            }
+            campaignReqs.add(campaignRepository.findById(campaignId).get());
+        }
+        return campaignReqs;
     }
 
     public ArrayList<String> getPaidCampaign(@NotNull String blogerId) {
@@ -307,6 +329,18 @@ public class BlogerService {
             rejectedCampaigns.add(campaignRepository.findById(campaignId).get());
         }
         return rejectedCampaigns;
+    }
+
+    public ArrayList<CampaignReq> getCampaignsAdminResponse() {
+        ArrayList<CampaignReq> campaigns = campaignRepository.findByAdminApprovalClient(true);
+        ArrayList<CampaignReq> campaignsAdminResponse = new ArrayList<>();
+        for (CampaignReq campaign : campaigns) {
+            if (campaign.getBlogerStatus().equals("Accepted") || campaign.getBlogerStatus().equals("Rejected")) {
+                campaignsAdminResponse.add(campaign);
+            }
+        }
+
+        return campaignsAdminResponse;
     }
 
 }

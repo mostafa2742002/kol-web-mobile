@@ -38,9 +38,9 @@ public class CampaignReq extends AuditableBase {
 
     private Boolean adminApprovalClient = false;
 
-    private String content;
+    private String content = "";
 
-    private String campaignUrl;
+    private String campaignUrl = "";
 
     private Boolean adminApprovalBloger = false;
 }

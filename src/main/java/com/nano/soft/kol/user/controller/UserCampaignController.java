@@ -43,22 +43,22 @@ public class UserCampaignController {
     }
 
     @GetMapping("/user/requested-campaign")
-    public ResponseEntity<ArrayList<String>> getRequestedCampaign(@RequestParam @NotNull String userId) {
+    public ResponseEntity<ArrayList<CampaignReq>> getRequestedCampaign(@RequestParam @NotNull String userId) {
         return ResponseEntity.ok(userCampaignService.getRequestedCampaign(userId));
     }
 
     @GetMapping("/user/Accepted-campaign")
-    public ResponseEntity<ArrayList<String>> getAcceptedCampaign(@RequestParam @NotNull String userId) {
+    public ResponseEntity<ArrayList<CampaignReq>> getAcceptedCampaign(@RequestParam @NotNull String userId) {
         return ResponseEntity.ok(userCampaignService.getAcceptedCampaign(userId));
     }
 
     @GetMapping("/user/rejected-campaign")
-    public ResponseEntity<ArrayList<String>> getRejectedCampaign(@RequestParam @NotNull String userId) {
+    public ResponseEntity<ArrayList<CampaignReq>> getRejectedCampaign(@RequestParam @NotNull String userId) {
         return ResponseEntity.ok(userCampaignService.getRejectedCampaign(userId));
     }
 
     @GetMapping("/user/done-campaign")
-    public ResponseEntity<ArrayList<String>> getDoneCampaign(@RequestParam @NotNull String userId) {
+    public ResponseEntity<ArrayList<CampaignReq>> getDoneCampaign(@RequestParam @NotNull String userId) {
         return ResponseEntity.ok(userCampaignService.getDoneCampaign(userId));
     }
 }
