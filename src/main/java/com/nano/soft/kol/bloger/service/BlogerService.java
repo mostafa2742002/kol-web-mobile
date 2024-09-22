@@ -169,7 +169,7 @@ public class BlogerService {
         User user = userRepository.findById(campaignReq.getClientId()).get();
         String campaignId = campaignReq.getId();
         boolean blogerResponse = campaignReq.getBlogerStatus().equals("Accepted");
-        
+
         // delete the campaign from the user requested campaigns
         user.getRequestedCampaign().remove(campaignId);
         // add the campaign to the user accepted or rejected campaigns
@@ -189,9 +189,6 @@ public class BlogerService {
             throw new ResourceNotFoundException("Campaign", "Id", campaignId);
         }
 
-        
-        
-        
         CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
         campaignReq.setBlogerStatus((blogerResponse) ? "Accepted" : "Rejected");
         campaignReq.setContent(content);
@@ -234,6 +231,11 @@ public class BlogerService {
         user.getDoneCampaign().add(campaignReq.getId());
         user.getAcceptedCampaign().remove(campaignReq.getId());
         userRepository.save(user);
+
+        Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
+        bloger.getDoneCampaign().add(campaignReq.getId());
+        bloger.getPaidCampaign().remove(campaignReq.getId());
+        blogerRepository.save(bloger);
 
         return new ResponseDto("200", "Campaign sent to client successfully");
     }
@@ -288,7 +290,7 @@ public class BlogerService {
         Bloger bloger = blogerRepository.findById(blogerId).get();
         ArrayList<CampaignReq> campaignReqs = new ArrayList<>();
         for (String campaignId : bloger.getRequestedCampaign()) {
-            if(!campaignRepository.findById(campaignId).isPresent()) {
+            if (!campaignRepository.findById(campaignId).isPresent()) {
                 continue;
             }
             campaignReqs.add(campaignRepository.findById(campaignId).get());
@@ -343,4 +345,43 @@ public class BlogerService {
         return campaignsAdminResponse;
     }
 
+    public CampaignReq addPaidCampaign(@NotNull String blogerId, @NotNull String campaignId) {
+        if (!campaignRepository.findById(campaignId).isPresent()) {
+            throw new ResourceNotFoundException("Campaign", "Id", campaignId);
+        }
+
+        if (!blogerRepository.findById(blogerId).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        }
+
+        CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
+        Bloger bloger = blogerRepository.findById(blogerId).get();
+        bloger.getPaidCampaign().add(campaignId);
+        blogerRepository.save(bloger);
+        return campaignReq;
+    }
+
+    public ArrayList<Bloger> searchBloger(String keyword) {
+        ArrayList<Bloger> blogers = (ArrayList<Bloger>) blogerRepository.findAll();
+        ArrayList<Bloger> filteredBlogers = new ArrayList<>();
+        for (Bloger bloger : blogers) {
+            if (
+                    bloger.getCountryOfResidence().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getNationality().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getCity().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getFirst_name().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getLast_name().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getBio().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getInstagramUrl().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getSnapchatUrl().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getTiktokUrl().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getYoutubeUrl().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getCareer().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getNationality().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getInterests().contains(keyword.toLowerCase())
+                )
+                filteredBlogers.add(bloger);
+        }
+        return filteredBlogers;
+    }
 }

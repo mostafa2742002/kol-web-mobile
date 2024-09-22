@@ -155,4 +155,16 @@ public class BlogerController {
     public ResponseEntity<ArrayList<String>> getPaidCampaign(@RequestParam @NotNull String blogerId) {
         return ResponseEntity.ok(blogerService.getPaidCampaign(blogerId));
     }
+
+    @PostMapping("/bloger/add/paid-campaign")
+    public ResponseEntity<CampaignReq> addPaidCampaign(@RequestParam @NotNull String blogerId,
+    @RequestParam @NotNull String campaignId) {
+        return ResponseEntity.ok(blogerService.addPaidCampaign(blogerId, campaignId));
+    }
+    
+    @GetMapping("/bloger/search")
+    public ResponseEntity<ArrayList<Bloger>> searchBloger(@RequestParam String keyword) {
+        return ResponseEntity.ok(blogerService.searchBloger(keyword));
+    }
+
 }
