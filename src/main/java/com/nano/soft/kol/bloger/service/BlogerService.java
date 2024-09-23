@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.nano.soft.kol.bloger.dto.BlogerDTO;
+import com.nano.soft.kol.bloger.dto.SearchDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
 import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.bloger.entity.Category;
@@ -250,13 +251,9 @@ public class BlogerService {
     public List<Bloger> getBlogerByFilter(String category, String country, String type, Integer age) {
         List<Bloger> blogers = blogerRepository.findAll();
         List<Bloger> filteredBlogers = new ArrayList<>();
-        Category category_id = categoryRepository.findByName(category);
-        if (category_id == null) {
-            throw new IllegalArgumentException("Category not found");
-        }
 
         for (Bloger bloger : blogers) {
-            if (category != null && !bloger.getInterests().contains(category_id.getId())) {
+            if (category != null && !bloger.getInterests().contains(category)) {
                 continue;
             }
             if (country != null && !bloger.getCountryOfResidence().equals(country)) {
@@ -361,7 +358,7 @@ public class BlogerService {
         return campaignReq;
     }
 
-    public ArrayList<Bloger> searchBloger(String keyword) {
+    public SearchDTO searchBloger(String keyword) {
         ArrayList<Bloger> blogers = (ArrayList<Bloger>) blogerRepository.findAll();
         ArrayList<Bloger> filteredBlogers = new ArrayList<>();
         for (Bloger bloger : blogers) {
@@ -369,6 +366,7 @@ public class BlogerService {
                     bloger.getCountryOfResidence().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getNationality().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getCity().toLowerCase().contains(keyword.toLowerCase()) ||
+                    bloger.getName().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getFirst_name().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getLast_name().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getBio().toLowerCase().contains(keyword.toLowerCase()) ||
@@ -378,10 +376,25 @@ public class BlogerService {
                     bloger.getYoutubeUrl().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getCareer().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getNationality().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getInterests().contains(keyword.toLowerCase())
+                    bloger.getInterests().contains(keyword)
                 )
                 filteredBlogers.add(bloger);
         }
-        return filteredBlogers;
+
+        ArrayList<Category> categories = (ArrayList<Category>) categoryRepository.findAll();
+        ArrayList<Category> filteredCategories = new ArrayList<>();
+        for (Category category : categories) {
+            if (category.getName().toLowerCase().contains(keyword.toLowerCase())) {
+                filteredCategories.add(category);
+            }
+        }
+            
+
+        SearchDTO searchDTO = new SearchDTO();
+        searchDTO.setBlogers(filteredBlogers);
+        searchDTO.setCategories(filteredCategories);
+
+        return searchDTO;
+        
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nano.soft.kol.bloger.dto.BlogerDTO;
+import com.nano.soft.kol.bloger.dto.SearchDTO;
 import com.nano.soft.kol.bloger.entity.Bloger;
 import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.bloger.entity.CategoryNumber;
@@ -163,7 +164,7 @@ public class BlogerController {
     }
     
     @GetMapping("/bloger/search")
-    public ResponseEntity<ArrayList<Bloger>> searchBloger(@RequestParam String keyword) {
+    public ResponseEntity<SearchDTO> searchBloger(@RequestParam String keyword) {
         return ResponseEntity.ok(blogerService.searchBloger(keyword));
     }
 
