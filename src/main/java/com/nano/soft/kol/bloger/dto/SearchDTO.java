@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.nano.soft.kol.bloger.entity.Bloger;
 import com.nano.soft.kol.bloger.entity.Category;
+import com.nano.soft.kol.bloger.entity.CategoryNumber;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SearchDTO {
 
-    ArrayList<Category> categories;
+    ArrayList<CategoryNumber> categories;
     ArrayList<Bloger> blogers;
 }

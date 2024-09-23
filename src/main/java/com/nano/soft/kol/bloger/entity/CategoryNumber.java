@@ -1,9 +1,15 @@
 package com.nano.soft.kol.bloger.entity;
 
-public record CategoryNumber(String name, int number, String image) {
-    public CategoryNumber {
-        if (number < 0) {
-            throw new IllegalArgumentException("number should be positive");
-        }
-    }
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CategoryNumber {
+    
+    private String name;
+    private int number;
+    private String image;
 }

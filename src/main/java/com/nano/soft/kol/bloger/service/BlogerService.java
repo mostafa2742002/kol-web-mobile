@@ -362,22 +362,13 @@ public class BlogerService {
         ArrayList<Bloger> blogers = (ArrayList<Bloger>) blogerRepository.findAll();
         ArrayList<Bloger> filteredBlogers = new ArrayList<>();
         for (Bloger bloger : blogers) {
-            if (
-                    bloger.getCountryOfResidence().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getNationality().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getCity().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getName().toLowerCase().contains(keyword.toLowerCase()) ||
+            if (bloger.getName().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getFirst_name().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getLast_name().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getBio().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getInstagramUrl().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getSnapchatUrl().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getTiktokUrl().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getYoutubeUrl().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getCareer().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getNationality().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getInterests().contains(keyword)
-                )
+                    bloger.getYoutubeUrl().toLowerCase().contains(keyword.toLowerCase()))
                 filteredBlogers.add(bloger);
         }
 
@@ -388,13 +379,28 @@ public class BlogerService {
                 filteredCategories.add(category);
             }
         }
-            
 
         SearchDTO searchDTO = new SearchDTO();
         searchDTO.setBlogers(filteredBlogers);
-        searchDTO.setCategories(filteredCategories);
+        searchDTO.setCategories(getCategoryNumber(filteredCategories));
 
         return searchDTO;
-        
     }
+
+    public ArrayList<CategoryNumber> getCategoryNumber(ArrayList<Category> categories) {
+        ArrayList<CategoryNumber> categoryNumbers = getCategories();
+        ArrayList<CategoryNumber> filteredCategoryNumbers = new ArrayList<>();
+
+        // now we want only the categories that are in the categories list
+        for (CategoryNumber categoryNumber : categoryNumbers) {
+            for (Category category : categories) {
+                if (categoryNumber.getName().equals(category.getName())) {
+                    filteredCategoryNumbers.add(categoryNumber);
+                }
+            }
+
+        }
+        return filteredCategoryNumbers;
+    }
+
 }
