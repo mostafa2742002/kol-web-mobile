@@ -34,6 +34,10 @@ public class CampaignReq extends AuditableBase {
 
     private String blogerId;
 
+    private String blogerName;
+
+    private String blogerImage;
+
     private String clientId;
 
     private Boolean adminApprovalClient = false;
@@ -41,6 +45,8 @@ public class CampaignReq extends AuditableBase {
     private String content = "";
 
     private String campaignUrl = "";
+
+    private Boolean adminApprovalBlogerResponse = false;
 
     private Boolean adminApprovalBloger = false;
 }

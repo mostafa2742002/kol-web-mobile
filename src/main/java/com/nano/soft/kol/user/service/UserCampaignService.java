@@ -30,6 +30,15 @@ public class UserCampaignService {
         if (!userRepository.findById(campaignReq.getClientId()).isPresent()) {
             throw new ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
         }
+
+        if (!blogerRepository.findById(campaignReq.getBlogerId()).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", campaignReq.getBlogerId());
+        }
+
+        Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
+        campaignReq.setBlogerName(bloger.getName());
+        campaignReq.setBlogerImage(bloger.getImage());
+
         campaignRepository.save(campaignReq);
 
         Optional<User> user = userRepository.findById(campaignReq.getClientId());
@@ -44,14 +53,17 @@ public class UserCampaignService {
     }
 
     public ResponseDto requestCampaignToBloger(@NotNull CampaignReq campaignReq) {
-        System.out.println(2);
+        if (!blogerRepository.findById(campaignReq.getBlogerId()).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", campaignReq.getBlogerId());
+        }
         if (!campaignReq.getAdminApprovalClient()) {
-            System.out.println(1);
+
             if (userRepository.findById(campaignReq.getClientId()).isPresent()) {
                 throw new ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
             }
             User user = userRepository.findById(campaignReq.getClientId()).get();
             user.getRejectedCampaign().add(campaignReq.getId());
+            user.getRequestedCampaign().remove(campaignReq.getId());
             userRepository.save(user);
             return new ResponseDto("201", "Campaign request sent successfully");
         }
@@ -61,19 +73,10 @@ public class UserCampaignService {
         }
 
         Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
-        System.out.println(campaignReq.getBlogerId());
-        System.out.println(campaignReq.getId());
-        
+
         bloger.getRequestedCampaign().add(campaignReq.getId());
         blogerRepository.save(bloger);
-        if (!userRepository.findById(campaignReq.getClientId()).isPresent()) {
-            throw new ResourceNotFoundException("User Id", "Id", campaignReq.getClientId());
-        }
-
-
-        User user = userRepository.findById(campaignReq.getClientId()).get();
-        user.getRequestedCampaign().add(campaignReq.getId());
-        userRepository.save(user);
+        
 
         campaignRepository.save(campaignReq);
         return new ResponseDto("201", "Campaign request sent successfully");
