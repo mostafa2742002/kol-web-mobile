@@ -12,4 +12,6 @@ public interface CampaignRepository extends MongoRepository<CampaignReq, String>
 
     ArrayList<CampaignReq> findByAdminApprovalClient(boolean b);
 
+    ArrayList<CampaignReq> findByDoneFromBloger(boolean b);
+
 }

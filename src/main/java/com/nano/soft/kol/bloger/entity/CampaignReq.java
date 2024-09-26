@@ -46,6 +46,8 @@ public class CampaignReq extends AuditableBase {
 
     private String campaignUrl = "";
 
+    private Boolean DoneFromBloger = false;
+
     private Boolean adminApprovalBlogerResponse = false;
 
     private Boolean adminApprovalBloger = false;

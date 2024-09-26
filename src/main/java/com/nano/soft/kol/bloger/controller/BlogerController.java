@@ -123,6 +123,11 @@ public class BlogerController {
         return ResponseEntity.ok(blogerService.getCampaignsAdminResponse());
     }
 
+    @GetMapping("/campaign/admin/complete")
+    public ResponseEntity<ArrayList<CampaignReq>> getCampaignsAdminComplete() {
+        return ResponseEntity.ok(blogerService.getCampaignsAdminComplete());
+    }
+
     @PostMapping("/campaign/complete/to-admin")
     public ResponseEntity<ResponseDto> completeToAdmin(
             @RequestBody @Valid @NotNull CampaignReq campaignComplete) {

@@ -212,6 +212,9 @@ public class BlogerService {
         }
 
         CampaignReq campaignReq = campaignRepository.findById(campaignComplete.getId()).get();
+
+        campaignReq.setCampaignUrl(campaignComplete.getCampaignUrl());
+        campaignReq.setDoneFromBloger(true);
         campaignRepository.save(campaignReq);
 
         return new ResponseDto("200", "Campaign sent to admin successfully");
@@ -227,6 +230,7 @@ public class BlogerService {
 
         CampaignReq campaignReq = campaignRepository.findById(campaignComplete.getId()).get();
         campaignReq.setAdminApprovalBloger(true);
+        campaignReq.setDoneFromBloger(false);
         campaignRepository.save(campaignReq);
 
         User user = userRepository.findById(campaignReq.getClientId()).get();
@@ -337,8 +341,9 @@ public class BlogerService {
         for (CampaignReq campaign : campaigns) {
             if (campaign.getBlogerStatus().equals("Accepted") || campaign.getBlogerStatus().equals("Rejected")) {
                 if(campaign.getAdminApprovalBlogerResponse()) {
-                campaignsAdminResponse.add(campaign);
+                    continue;
                 }
+                campaignsAdminResponse.add(campaign);
             }
         }
 
@@ -404,6 +409,10 @@ public class BlogerService {
 
         }
         return filteredCategoryNumbers;
+    }
+
+    public ArrayList<CampaignReq> getCampaignsAdminComplete() {
+        return campaignRepository.findByDoneFromBloger(true);
     }
 
 }

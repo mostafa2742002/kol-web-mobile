@@ -33,7 +33,10 @@ public class CategoryService {
     public Category updateCategory(String id, Category category) {
         return categoryRepository.findById(id)
                 .map(existingCategory -> {
+                    if(category.getName() != null)
                     existingCategory.setName(category.getName());
+                    if(category.getImage() != null)
+                    existingCategory.setImage(category.getImage());
                     return categoryRepository.save(existingCategory);
                 })
                 .orElseThrow(() -> new RuntimeException("Category not found"));
