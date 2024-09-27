@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -117,18 +118,49 @@ public class BlogerService {
 
     public ArrayList<CategoryNumber> getCategories() {
         ArrayList<CategoryNumber> categories = new ArrayList<>();
-        ArrayList<Bloger> blogers = (ArrayList<Bloger>) blogerRepository.findAll();
+
+        // Handle null return from repositories
+        ArrayList<Bloger> blogers = (ArrayList<Bloger>) Optional.ofNullable(blogerRepository.findAll())
+                .orElseGet(ArrayList::new);
+        List<Category> categoriesList = Optional.ofNullable(categoryRepository.findAll())
+                .orElseGet(ArrayList::new);
+
+        // Map to store category counts
         HashMap<String, Integer> categoryMap = new HashMap<>();
+
+        // Iterate over blogers' interests and check against the categoriesList
         for (Bloger bloger : blogers) {
-            for (String category : bloger.getInterests()) {
+            List<String> interests = new ArrayList<>(bloger.getInterests()); // Copy to avoid modifying while iterating
+            for (String category : interests) {
+                boolean categoryExists = categoriesList.stream()
+                        .anyMatch(c -> c.getName().equals(category));
+
+                // If category is not found in categoriesList, remove from bloger interests
+                if (!categoryExists) {
+                    bloger.getInterests().remove(category); // Remove interest from Bloger
+                    blogerRepository.save(bloger); // Update bloger in DB
+                    continue;
+                }
+                // Add category to the map
                 categoryMap.put(category, categoryMap.getOrDefault(category, 0) + 1);
             }
         }
+
+        // Add CategoryNumber objects based on the category map
         for (String category : categoryMap.keySet()) {
-            List<Category> categoriesList = categoryRepository.findAll();
-            String image = categoriesList.stream().filter(c -> c.getName().equals(category)).findFirst().get()
-                    .getImage();
-            categories.add(new CategoryNumber(category, categoryMap.get(category), image));
+            // Find the category in categoriesList and handle the Optional properly
+            Optional<Category> matchedCategoryOpt = categoriesList.stream()
+                    .filter(c -> c.getName().equals(category))
+                    .findFirst();
+
+            if (matchedCategoryOpt.isPresent()) {
+                String image = matchedCategoryOpt.get().getImage();
+                categories.add(new CategoryNumber(category, categoryMap.get(category), image));
+            } else {
+                // Log or handle the case where the category isn't found, although this case
+                // should be rare
+                System.out.println("Category not found for: " + category);
+            }
         }
 
         return categories;
@@ -253,9 +285,11 @@ public class BlogerService {
         return blogerRepository.findByEmail(email);
     }
 
-    public List<Bloger> getBlogerByFilter(String category, String country, String type, Integer age) {
+    public List<Bloger> getBlogerByFilter(String category, String country, String type, Integer age,
+            Integer priceFrom, Integer priceTo, String price) {
         List<Bloger> blogers = blogerRepository.findAll();
         List<Bloger> filteredBlogers = new ArrayList<>();
+        price = price.toLowerCase();
 
         for (Bloger bloger : blogers) {
             if (category != null && !bloger.getInterests().contains(category)) {
@@ -276,6 +310,21 @@ public class BlogerService {
                 int blogerAge = currentDate.getYear() - birthDate.getYear();
                 if (blogerAge < lowerAge || blogerAge > upperAge) {
                     continue;
+                }
+            }
+
+            if (priceFrom != null && priceTo != null) {
+                if (bloger.getPrice() < priceFrom || bloger.getPrice() > priceTo) {
+                    continue;
+                }
+            }
+
+            if(price != null && !price.isEmpty()){
+                if(price.equals("asc")){
+                    filteredBlogers.sort((b1, b2) -> b1.getPrice().compareTo(b2.getPrice()));
+                }
+                else if(price.equals("desc")){
+                    filteredBlogers.sort((b1, b2) -> b2.getPrice().compareTo(b1.getPrice()));
                 }
             }
 
@@ -340,7 +389,7 @@ public class BlogerService {
         ArrayList<CampaignReq> campaignsAdminResponse = new ArrayList<>();
         for (CampaignReq campaign : campaigns) {
             if (campaign.getBlogerStatus().equals("Accepted") || campaign.getBlogerStatus().equals("Rejected")) {
-                if(campaign.getAdminApprovalBlogerResponse()) {
+                if (campaign.getAdminApprovalBlogerResponse()) {
                     continue;
                 }
                 campaignsAdminResponse.add(campaign);
@@ -367,27 +416,39 @@ public class BlogerService {
     }
 
     public SearchDTO searchBloger(String keyword) {
-        ArrayList<Bloger> blogers = (ArrayList<Bloger>) blogerRepository.findAll();
+        System.out.println(1);
+        ArrayList<Bloger> blogers = (ArrayList<Bloger>) Optional.ofNullable(blogerRepository.findAll())
+                .orElseGet(ArrayList::new);
+        if (keyword == null || keyword.isEmpty()) {
+            SearchDTO searchDTO = new SearchDTO();
+            searchDTO.setBlogers(new ArrayList<>());
+            searchDTO.setCategories(new ArrayList<>());
+            return searchDTO;
+        }
         ArrayList<Bloger> filteredBlogers = new ArrayList<>();
+        System.out.println(2);
         for (Bloger bloger : blogers) {
             if (bloger.getName().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getFirst_name().toLowerCase().contains(keyword.toLowerCase()) ||
                     bloger.getLast_name().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getInstagramUrl().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getSnapchatUrl().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getTiktokUrl().toLowerCase().contains(keyword.toLowerCase()) ||
-                    bloger.getYoutubeUrl().toLowerCase().contains(keyword.toLowerCase()))
+                    // i want the search by url to be exactly match
+                    bloger.getInstagramUrl().toLowerCase().equals(keyword.toLowerCase()) ||
+                    bloger.getSnapchatUrl().toLowerCase().equals(keyword.toLowerCase()) ||
+                    bloger.getTiktokUrl().toLowerCase().equals(keyword.toLowerCase()) ||
+                    bloger.getYoutubeUrl().toLowerCase().equals(keyword.toLowerCase())) {
                 filteredBlogers.add(bloger);
+            }
         }
-
-        ArrayList<Category> categories = (ArrayList<Category>) categoryRepository.findAll();
+        System.out.println(3);
+        ArrayList<Category> categories = (ArrayList<Category>) Optional.ofNullable(categoryRepository.findAll())
+                .orElseGet(ArrayList::new);
         ArrayList<Category> filteredCategories = new ArrayList<>();
         for (Category category : categories) {
             if (category.getName().toLowerCase().contains(keyword.toLowerCase())) {
                 filteredCategories.add(category);
             }
         }
-
+        System.out.println(4);
         SearchDTO searchDTO = new SearchDTO();
         searchDTO.setBlogers(filteredBlogers);
         searchDTO.setCategories(getCategoryNumber(filteredCategories));
@@ -396,6 +457,7 @@ public class BlogerService {
     }
 
     public ArrayList<CategoryNumber> getCategoryNumber(ArrayList<Category> categories) {
+        System.out.println(5);
         ArrayList<CategoryNumber> categoryNumbers = getCategories();
         ArrayList<CategoryNumber> filteredCategoryNumbers = new ArrayList<>();
 
@@ -408,11 +470,25 @@ public class BlogerService {
             }
 
         }
+        System.out.println(6);
         return filteredCategoryNumbers;
     }
 
     public ArrayList<CampaignReq> getCampaignsAdminComplete() {
         return campaignRepository.findByDoneFromBloger(true);
+    }
+
+    public List<String> getCountries() {
+        // we will get the countries from the blogers (countryOfResidence) and we will
+        // remove the duplicates
+        List<Bloger> blogers = blogerRepository.findAll();
+        List<String> countries = new ArrayList<>();
+        for (Bloger bloger : blogers) {
+            if (!countries.contains(bloger.getCountryOfResidence())) {
+                countries.add(bloger.getCountryOfResidence());
+            }
+        }
+        return countries;
     }
 
 }

@@ -74,8 +74,11 @@ public class BlogerController {
             @RequestParam(name = "category", required = false) String category,
             @RequestParam(name = "country", required = false) String country,
             @RequestParam(name = "type", required = false) String type,
-            @RequestParam(name = "age", required = false) Integer age) {
-        return ResponseEntity.ok(blogerService.getBlogerByFilter(category, country, type, age));
+            @RequestParam(name = "age", required = false) Integer age,
+            @RequestParam(name = "lowerPrice", required = false) Integer lowerPrice,
+            @RequestParam(name = "upperPrice", required = false) Integer upperPrice,
+            @RequestParam(name = "price",defaultValue = "asc", required = false) String price) {
+        return ResponseEntity.ok(blogerService.getBlogerByFilter(category, country, type, age, lowerPrice, upperPrice, price));
     }
 
     @Operation(summary = "Get bloger profile", description = "Get bloger profile by bloger id")
@@ -173,4 +176,8 @@ public class BlogerController {
         return ResponseEntity.ok(blogerService.searchBloger(keyword));
     }
 
+    @GetMapping("/bloger/countries")
+    public ResponseEntity<List<String>> getCountries() {
+        return ResponseEntity.ok(blogerService.getCountries());
+    }
 }
