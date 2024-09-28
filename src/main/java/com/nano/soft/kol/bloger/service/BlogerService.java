@@ -138,7 +138,7 @@ public class BlogerService {
                         .anyMatch(c -> c.getName().equals(category));
 
                 // If category is not found in categoriesList, remove from bloger interests
-                if (!categoryExists) {
+                if (!categoryExists && !category.equals("General")) {
                     bloger.getInterests().remove(category); // Remove interest from Bloger
                     blogerRepository.save(bloger); // Update bloger in DB
                     continue;
