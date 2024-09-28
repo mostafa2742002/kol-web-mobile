@@ -21,6 +21,7 @@ import com.nano.soft.kol.bloger.entity.CategoryNumber;
 import com.nano.soft.kol.bloger.entity.PageResponse;
 import com.nano.soft.kol.bloger.repo.BlogerRepository;
 import com.nano.soft.kol.bloger.repo.CategoryRepository;
+import com.nano.soft.kol.constants.BlogerCache;
 import com.nano.soft.kol.dto.ResponseDto;
 import com.nano.soft.kol.email.EmailService;
 import com.nano.soft.kol.exception.ResourceNotFoundException;
@@ -45,6 +46,7 @@ public class BlogerService {
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final BlogerCache blogerCache;
 
     public String registerBloger(@Valid @NotNull BlogerDTO blogerDTO) throws MessagingException, InterruptedException {
         if (blogerRepository.findByEmail(blogerDTO.getEmail()) != null) {
@@ -286,10 +288,9 @@ public class BlogerService {
     }
 
     public List<Bloger> getBlogerByFilter(String category, String country, String type, Integer age,
-            Integer priceFrom, Integer priceTo, String price) {
+            Integer priceFrom, Integer priceTo) {
         List<Bloger> blogers = blogerRepository.findAll();
         List<Bloger> filteredBlogers = new ArrayList<>();
-        price = price.toLowerCase();
 
         for (Bloger bloger : blogers) {
             if (category != null && !bloger.getInterests().contains(category)) {
@@ -316,15 +317,6 @@ public class BlogerService {
             if (priceFrom != null && priceTo != null) {
                 if (bloger.getPrice() < priceFrom || bloger.getPrice() > priceTo) {
                     continue;
-                }
-            }
-
-            if(price != null && !price.isEmpty()){
-                if(price.equals("asc")){
-                    filteredBlogers.sort((b1, b2) -> b1.getPrice().compareTo(b2.getPrice()));
-                }
-                else if(price.equals("desc")){
-                    filteredBlogers.sort((b1, b2) -> b2.getPrice().compareTo(b1.getPrice()));
                 }
             }
 
@@ -491,4 +483,17 @@ public class BlogerService {
         return countries;
     }
 
+    public List<Integer> getMinMaxAge() {
+        List<Integer> minMaxAge = new ArrayList<>();
+        minMaxAge.add(blogerCache.getMinAge());
+        minMaxAge.add(blogerCache.getMaxAge());
+        return minMaxAge;
+    }
+
+    public List<Integer> getMinMaxPrice() {
+        List<Integer> minMaxCalary = new ArrayList<>();
+        minMaxCalary.add(blogerCache.getMinSalary());
+        minMaxCalary.add(blogerCache.getMaxSalary());
+        return minMaxCalary;
+    }
 }

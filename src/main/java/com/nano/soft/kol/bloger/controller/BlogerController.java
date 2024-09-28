@@ -76,9 +76,18 @@ public class BlogerController {
             @RequestParam(name = "type", required = false) String type,
             @RequestParam(name = "age", required = false) Integer age,
             @RequestParam(name = "lowerPrice", required = false) Integer lowerPrice,
-            @RequestParam(name = "upperPrice", required = false) Integer upperPrice,
-            @RequestParam(name = "price",defaultValue = "asc", required = false) String price) {
-        return ResponseEntity.ok(blogerService.getBlogerByFilter(category, country, type, age, lowerPrice, upperPrice, price));
+            @RequestParam(name = "upperPrice", required = false) Integer upperPrice) {
+        return ResponseEntity.ok(blogerService.getBlogerByFilter(category, country, type, age, lowerPrice, upperPrice));
+    }
+
+    @GetMapping("/bloger/min-max-age")
+    public ResponseEntity<List<Integer>> getMinMaxAge() {
+        return ResponseEntity.ok(blogerService.getMinMaxAge());
+    }
+
+    @GetMapping("/bloger/min-max-price")
+    public ResponseEntity<List<Integer>> getMinMaxPrice() {
+        return ResponseEntity.ok(blogerService.getMinMaxPrice());
     }
 
     @Operation(summary = "Get bloger profile", description = "Get bloger profile by bloger id")

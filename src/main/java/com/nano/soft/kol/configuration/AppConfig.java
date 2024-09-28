@@ -16,4 +16,9 @@ public class AppConfig {
             throws Exception {
         return config.getAuthenticationManager();
     }
+
+    // @Bean
+    // public Integer exampleIntegerBean() {
+    //     return Integer.valueOf(123); // Example value, adjust as necessary
+    // }
 }
