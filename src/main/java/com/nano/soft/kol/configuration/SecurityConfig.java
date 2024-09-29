@@ -75,6 +75,7 @@ public class SecurityConfig {
                                 "/api/resetpassword",
                                 "/api/signup/bloger",
                                 "/api/signup/user",
+                                "/api/signin/admin",
                                 "/api/bloger",
                                 "/api/bloger/{id}",
                                 "/api/category",

@@ -59,7 +59,7 @@ public class UserService implements UserDetailsService {
         if (blogerRepository.findByEmail(userDTO.getEmail()) != null) {
             throw new IllegalArgumentException("You are already a bloger");
         }
-        
+
         userDTO.setEmail(userDTO.getEmail().toLowerCase());
         User user = new User(userDTO);
         String verificationToken = jwtService.generateToken(user);
@@ -118,9 +118,16 @@ public class UserService implements UserDetailsService {
     public JwtResponse loginAdmin(@NonNull LoginDTO loginDTO) {
         loginDTO.setEmail(loginDTO.getEmail().toLowerCase());
         String adminEmail = "koladminkol19500@gmail.com";
-        String adminPassword = "koladminkol19500";
-        if (loginDTO.getEmail().equals(adminEmail) && loginDTO.getPassword().equals(adminPassword)) {
-            return new JwtResponse(jwtService.generateToken(null), jwtService.generateRefreshToken(null), null, "admin");
+        User admin = userRepository.findByEmail(adminEmail);
+        if (admin != null && loginDTO.getEmail().equals(adminEmail) && bCryptPasswordEncoder.matches(loginDTO.getPassword(), admin.getPassword())) {
+
+            // if (admin.isEmailVerified() == false)
+            // throw new IllegalArgumentException("Email not verified");
+
+            // userRepository.save(admin);
+
+            return new JwtResponse(jwtService.generateToken(admin), jwtService.generateRefreshToken(admin), admin,
+                    "admin");
         }
         throw new IllegalArgumentException("Invalid credentials");
     }

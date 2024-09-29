@@ -210,4 +210,6 @@ public class UserController {
         public ResponseEntity<List<CampaignReq>> getCampaigns() {
                 return ResponseEntity.ok(userService.getCampaigns());
         }
+
+        
 }

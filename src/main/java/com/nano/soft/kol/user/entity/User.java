@@ -59,6 +59,7 @@ public class User extends AuditableBase implements UserDetails {
     private ArrayList<String> rejectedCampaign = new ArrayList<>();
     private ArrayList<String> doneCampaign = new ArrayList<>();
     private ArrayList<String> favoriteBlogers = new ArrayList<>();
+    private ArrayList<String> liveCampaign = new ArrayList<>();
 
     @Schema(hidden = true)
     private String token;

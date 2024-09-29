@@ -200,7 +200,6 @@ public class BlogerService {
         if (!userRepository.findById(campaignReq.getClientId()).isPresent()) {
             throw new ResourceNotFoundException("User", "Id", campaignReq.getClientId());
         }
-        campaignReq.setAdminApprovalBlogerResponse(true);
         User user = userRepository.findById(campaignReq.getClientId()).get();
         String campaignId = campaignReq.getId();
         boolean blogerResponse = campaignReq.getBlogerStatus().equals("Accepted");
@@ -215,7 +214,10 @@ public class BlogerService {
         }
 
         userRepository.save(user);
-        campaignRepository.save(campaignReq);
+        CampaignReq campaign = campaignRepository.findById(campaignId).get();
+        campaign.setAdminApprovalBlogerResponse(true);
+
+        campaignRepository.save(campaign);
         return new ResponseDto("200", "Response sent successfully");
     }
 
@@ -268,12 +270,12 @@ public class BlogerService {
         campaignRepository.save(campaignReq);
 
         User user = userRepository.findById(campaignReq.getClientId()).get();
-        user.getDoneCampaign().add(campaignReq.getId());
+        user.getLiveCampaign().add(campaignReq.getId());
         user.getAcceptedCampaign().remove(campaignReq.getId());
         userRepository.save(user);
 
         Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
-        bloger.getDoneCampaign().add(campaignReq.getId());
+        bloger.getLiveCampaign();
         bloger.getPaidCampaign().remove(campaignReq.getId());
         blogerRepository.save(bloger);
 
@@ -341,13 +343,21 @@ public class BlogerService {
         return campaignReqs;
     }
 
-    public ArrayList<String> getPaidCampaign(@NotNull String blogerId) {
+    public ArrayList<CampaignReq> getPaidCampaign(@NotNull String blogerId) {
         if (!blogerRepository.findById(blogerId).isPresent()) {
             throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
         }
 
         Bloger bloger = blogerRepository.findById(blogerId).get();
-        return bloger.getPaidCampaign();
+        ArrayList<CampaignReq> paidCampaigns = new ArrayList<>();
+        for (String campaignId : bloger.getPaidCampaign()) {
+            if (!campaignRepository.findById(campaignId).isPresent()) {
+                continue;
+            }
+            paidCampaigns.add(campaignRepository.findById(campaignId).get());
+        }
+        return paidCampaigns;
+
     }
 
     public void rejectedToBloger(@Valid @NotNull CampaignReq campaignRejected) {
@@ -391,19 +401,25 @@ public class BlogerService {
         return campaignsAdminResponse;
     }
 
-    public CampaignReq addPaidCampaign(@NotNull String blogerId, @NotNull String campaignId) {
+    public CampaignReq addPaidCampaign(@NotNull String campaignId) {
         if (!campaignRepository.findById(campaignId).isPresent()) {
             throw new ResourceNotFoundException("Campaign", "Id", campaignId);
         }
 
-        if (!blogerRepository.findById(blogerId).isPresent()) {
-            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
+
+        if (!blogerRepository.findById(campaignReq.getBlogerId()).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", campaignReq.getBlogerId());
         }
 
-        CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
-        Bloger bloger = blogerRepository.findById(blogerId).get();
+        Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
         bloger.getPaidCampaign().add(campaignId);
         blogerRepository.save(bloger);
+
+        User user = userRepository.findById(campaignReq.getClientId()).get();
+        user.getAcceptedCampaign().remove(campaignId);
+        userRepository.save(user);
+
         return campaignReq;
     }
 
@@ -495,5 +511,38 @@ public class BlogerService {
         minMaxCalary.add(blogerCache.getMinSalary());
         minMaxCalary.add(blogerCache.getMaxSalary());
         return minMaxCalary;
+    }
+
+    public ArrayList<CampaignReq> getLiveCampaign(@NotNull String blogerId) {
+        if (!blogerRepository.findById(blogerId).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        }
+        // we will get the (TO) Date From the campaign if this date is before the
+        // current we will delete it from live campaign to done campaign
+        Bloger bloger = blogerRepository.findById(blogerId).get();
+        ArrayList<CampaignReq> liveCampaigns = new ArrayList<>();
+        for (String campaignId : bloger.getLiveCampaign()) {
+
+            if (!campaignRepository.findById(campaignId).isPresent()) {
+                continue;
+            }
+            CampaignReq campaign = campaignRepository.findById(campaignId).get();
+            // this is the (to) date in the database : 2024-10-03T06:46:00.000Z. it saved as
+            // a string
+            String campaignDate = campaign.getTo();
+            // this is the current date
+            String currentDate = LocalDate.now().toString();
+            // if the campaign date is before the current date we will delete it from live
+            // campaign to done campaign
+            if (campaignDate.compareTo(currentDate) < 0) {
+                bloger.getLiveCampaign().remove(campaignId);
+                bloger.getDoneCampaign().add(campaignId);
+                blogerRepository.save(bloger);
+                continue;
+            }
+
+            liveCampaigns.add(campaignRepository.findById(campaignId).get());
+        }
+        return liveCampaigns;
     }
 }

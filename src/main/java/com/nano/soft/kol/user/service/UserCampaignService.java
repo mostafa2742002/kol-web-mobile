@@ -2,7 +2,7 @@ package com.nano.soft.kol.user.service;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
+import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.nano.soft.kol.bloger.entity.Bloger;
@@ -76,9 +76,10 @@ public class UserCampaignService {
 
         bloger.getRequestedCampaign().add(campaignReq.getId());
         blogerRepository.save(bloger);
-        
+        CampaignReq campaign = campaignRepository.findById(campaignReq.getId()).get();
+        campaign.setAdminApprovalClient(true);
 
-        campaignRepository.save(campaignReq);
+        campaignRepository.save(campaign);
         return new ResponseDto("201", "Campaign request sent successfully");
     }
 
@@ -142,4 +143,34 @@ public class UserCampaignService {
         return campaignRepository.findByAdminApprovalClient(false);
     }
 
+    public ArrayList<CampaignReq> getLiveCampaign(@NotNull String userId) {
+        if (!userRepository.findById(userId).isPresent()) {
+            throw new ResourceNotFoundException("User Id", "Id", userId);
+        }
+        User user = userRepository.findById(userId).get();
+        ArrayList<CampaignReq> liveCampaigns = new ArrayList<>();
+        for (String campaignId : user.getLiveCampaign()) {
+
+            if (!campaignRepository.findById(campaignId).isPresent()) {
+                continue;
+            }
+            CampaignReq campaign = campaignRepository.findById(campaignId).get();
+            // this is the (to) date in the database : 2024-10-03T06:46:00.000Z. it saved as
+            // a string
+            String campaignDate = campaign.getTo();
+            // this is the current date
+            String currentDate = LocalDate.now().toString();
+            // if the campaign date is before the current date we will delete it from live
+            // campaign to done campaign
+            if (campaignDate.compareTo(currentDate) < 0) {
+                user.getLiveCampaign().remove(campaignId);
+                user.getDoneCampaign().add(campaignId);
+                userRepository.save(user);
+                continue;
+            }
+
+            liveCampaigns.add(campaignRepository.findById(campaignId).get());
+        }
+        return liveCampaigns;
+    }
 }

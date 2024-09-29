@@ -170,14 +170,13 @@ public class BlogerController {
     }
 
     @GetMapping("/bloger/paid-campaign")
-    public ResponseEntity<ArrayList<String>> getPaidCampaign(@RequestParam @NotNull String blogerId) {
+    public ResponseEntity<ArrayList<CampaignReq>> getPaidCampaign(@RequestParam @NotNull String blogerId) {
         return ResponseEntity.ok(blogerService.getPaidCampaign(blogerId));
     }
 
     @PostMapping("/bloger/add/paid-campaign")
-    public ResponseEntity<CampaignReq> addPaidCampaign(@RequestParam @NotNull String blogerId,
-    @RequestParam @NotNull String campaignId) {
-        return ResponseEntity.ok(blogerService.addPaidCampaign(blogerId, campaignId));
+    public ResponseEntity<CampaignReq> addPaidCampaign(@RequestParam @NotNull String campaignId) {
+        return ResponseEntity.ok(blogerService.addPaidCampaign(campaignId));
     }
     
     @GetMapping("/bloger/search")
@@ -188,5 +187,10 @@ public class BlogerController {
     @GetMapping("/bloger/countries")
     public ResponseEntity<List<String>> getCountries() {
         return ResponseEntity.ok(blogerService.getCountries());
+    }
+
+    @GetMapping("/bloger/live-campaign")
+    public ResponseEntity<ArrayList<CampaignReq>> getLiveCampaign(@RequestParam @NotNull String blogerId) {
+        return ResponseEntity.ok(blogerService.getLiveCampaign(blogerId));
     }
 }

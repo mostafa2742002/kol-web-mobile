@@ -61,4 +61,9 @@ public class UserCampaignController {
     public ResponseEntity<ArrayList<CampaignReq>> getDoneCampaign(@RequestParam @NotNull String userId) {
         return ResponseEntity.ok(userCampaignService.getDoneCampaign(userId));
     }
+
+    @GetMapping("/user/live-campaign")
+    public ResponseEntity<ArrayList<CampaignReq>> getLiveCampaign(@RequestParam @NotNull String userId) {
+        return ResponseEntity.ok(userCampaignService.getLiveCampaign(userId));
+    }
 }
