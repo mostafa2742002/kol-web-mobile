@@ -80,6 +80,16 @@ public class UserController {
                 }
         }
 
+        @PostMapping("/signin/admin")
+        public ResponseEntity<?> loginAdmin(@RequestBody @Valid @NotNull LoginDTO userDTO) {
+                try {
+                        return ResponseEntity.ok(userService.loginAdmin(userDTO));
+                } catch (AuthenticationException e) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+                }
+        }
+        
+
         @Operation(summary = "Get user profile", description = "Get user profile by user id")
         @ApiResponses({ @ApiResponse(responseCode = "200", description = "Profile retrieved successfully"),
                         @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseDto.class)

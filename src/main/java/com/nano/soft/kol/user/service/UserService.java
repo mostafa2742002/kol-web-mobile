@@ -115,6 +115,16 @@ public class UserService implements UserDetailsService {
         throw new IllegalArgumentException("Invalid credentials");
     }
 
+    public JwtResponse loginAdmin(@NonNull LoginDTO loginDTO) {
+        loginDTO.setEmail(loginDTO.getEmail().toLowerCase());
+        String adminEmail = "koladminkol19500@gmail.com";
+        String adminPassword = "koladminkol19500";
+        if (loginDTO.getEmail().equals(adminEmail) && loginDTO.getPassword().equals(adminPassword)) {
+            return new JwtResponse(jwtService.generateToken(null), jwtService.generateRefreshToken(null), null, "admin");
+        }
+        throw new IllegalArgumentException("Invalid credentials");
+    }
+
     public User findUserByEmail(String email) {
         if (userRepository.findByEmail(email) == null) {
             throw new IllegalArgumentException("User not found");
