@@ -1,7 +1,10 @@
 package com.nano.soft.kol.bloger.service;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +22,7 @@ import com.nano.soft.kol.bloger.entity.CampaignReq;
 import com.nano.soft.kol.bloger.entity.Category;
 import com.nano.soft.kol.bloger.entity.CategoryNumber;
 import com.nano.soft.kol.bloger.entity.PageResponse;
+import com.nano.soft.kol.bloger.entity.Wallet;
 import com.nano.soft.kol.bloger.repo.BlogerRepository;
 import com.nano.soft.kol.bloger.repo.CategoryRepository;
 import com.nano.soft.kol.constants.BlogerCache;
@@ -266,7 +270,9 @@ public class BlogerService {
 
         CampaignReq campaignReq = campaignRepository.findById(campaignComplete.getId()).get();
         campaignReq.setAdminApprovalBloger(true);
-        campaignReq.setDoneFromBloger(false);
+        campaignReq.setDoneFromBloger(true);
+        campaignReq.setClientStatus("Done");
+        campaignReq.setBlogerStatus("Done");
         campaignRepository.save(campaignReq);
 
         User user = userRepository.findById(campaignReq.getClientId()).get();
@@ -407,19 +413,21 @@ public class BlogerService {
         }
 
         CampaignReq campaignReq = campaignRepository.findById(campaignId).get();
-
+        campaignReq.setClientStatus("Paid");
         if (!blogerRepository.findById(campaignReq.getBlogerId()).isPresent()) {
             throw new ResourceNotFoundException("Bloger Id", "Id", campaignReq.getBlogerId());
         }
 
         Bloger bloger = blogerRepository.findById(campaignReq.getBlogerId()).get();
         bloger.getPaidCampaign().add(campaignId);
+        bloger.getWallet().add(campaignId);
         blogerRepository.save(bloger);
 
         User user = userRepository.findById(campaignReq.getClientId()).get();
         user.getAcceptedCampaign().remove(campaignId);
         userRepository.save(user);
 
+        campaignRepository.save(campaignReq);
         return campaignReq;
     }
 
@@ -544,5 +552,109 @@ public class BlogerService {
             liveCampaigns.add(campaignRepository.findById(campaignId).get());
         }
         return liveCampaigns;
+    }
+
+    public List<CampaignReq> getPaidCampaignAdmin() {
+        return campaignRepository.findByClientStatus("Paid");
+    }
+
+    public List<CampaignReq> getLiveCampaignAdmin() {
+        List<CampaignReq> campaign = campaignRepository.findByClientStatusAndBlogerStatus("Done", "Done");
+        List<CampaignReq> liveCampaign = new ArrayList<>();
+
+        // Specify the desired time zone
+        ZoneId zoneId = ZoneId.of("UTC"); // Change to your desired time zone
+        LocalDate now = LocalDate.now(zoneId);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Adjust pattern as needed
+
+        for (CampaignReq campaignReq : campaign) {
+            try {
+                LocalDate fromDate = LocalDate.parse(campaignReq.getFrom(), formatter);
+                LocalDate toDate = LocalDate.parse(campaignReq.getTo(), formatter);
+                System.err.println("Processing Campaign: " + campaignReq.getCampaignDescription());
+                System.err.println("Current Date: " + now + ", From: " + fromDate + ", To: " + toDate);
+
+                if ((fromDate.isBefore(now) || fromDate.isEqual(now)) &&
+                        (toDate.isAfter(now) || toDate.isEqual(now))) {
+                    liveCampaign.add(campaignReq);
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Error parsing date for campaign: " + campaignReq.getId());
+                System.out.println("Error details: " + e.getMessage());
+            }
+        }
+        return liveCampaign;
+    }
+
+    public List<CampaignReq> getDoneCampaignAdmin() {
+        // Fetch all campaigns with 'Done' status for both client and blogger
+        List<CampaignReq> campaign = campaignRepository.findByClientStatusAndBlogerStatus("Done", "Done");
+        List<CampaignReq> doneCampaign = new ArrayList<>();
+
+        // Specify the desired time zone (e.g., UTC)
+        ZoneId zoneId = ZoneId.of("UTC"); // Change this to your required time zone
+        LocalDate now = LocalDate.now(zoneId);
+
+        // Define the date format if needed (adjust the pattern based on your date
+        // string format)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Adjust the pattern as necessary
+
+        // Iterate through each campaign and check if it's done based on the 'to' date
+        for (CampaignReq campaignReq : campaign) {
+            try {
+                // Parse the 'to' date field
+                LocalDate toDate = LocalDate.parse(campaignReq.getTo(), formatter);
+
+                // Log campaign details for debugging
+                System.err.println("Processing Campaign: " + campaignReq.getCampaignDescription());
+                System.err.println("Current Date: " + now + ", To Date: " + toDate);
+
+                // Check if the 'to' date is before the current date (campaign is done)
+                if (toDate.isBefore(now)) {
+                    doneCampaign.add(campaignReq);
+                }
+            } catch (DateTimeParseException e) {
+                // Log the error and continue to the next campaign
+                System.out.println("Error parsing 'to' date for campaign: " + campaignReq.getId());
+                System.out.println("Error details: " + e.getMessage());
+            }
+        }
+
+        return doneCampaign;
+    }
+
+    public Wallet getWallet(@NotNull String blogerId) {
+        if (!blogerRepository.findById(blogerId).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        }
+        Bloger bloger = blogerRepository.findById(blogerId).get();
+        Wallet wallet = new Wallet();
+        wallet.setBalance(bloger.getWallet().size() * bloger.getPrice());
+        ArrayList<CampaignReq> campaigns = new ArrayList<>();
+        for (String campaignId : bloger.getWallet()) {
+            if (!campaignRepository.findById(campaignId).isPresent()) {
+                continue;
+            }
+            campaigns.add(campaignRepository.findById(campaignId).get());
+        }
+        wallet.setCampaigns(campaigns);
+        return wallet;
+    }
+
+    public ArrayList<CampaignReq> getDoneCampaign(@NotNull String blogerId) {
+        if (!blogerRepository.findById(blogerId).isPresent()) {
+            throw new ResourceNotFoundException("Bloger Id", "Id", blogerId);
+        }
+
+        Bloger bloger = blogerRepository.findById(blogerId).get();
+        ArrayList<CampaignReq> doneCampaigns = new ArrayList<>();
+        for (String campaignId : bloger.getDoneCampaign()) {
+            if (!campaignRepository.findById(campaignId).isPresent()) {
+                continue;
+            }
+            doneCampaigns.add(campaignRepository.findById(campaignId).get());
+        }
+        return doneCampaigns;
     }
 }

@@ -174,6 +174,11 @@ public class BlogerController {
         return ResponseEntity.ok(blogerService.getPaidCampaign(blogerId));
     }
 
+    @GetMapping("/bloger/done-campaign")
+    public ResponseEntity<ArrayList<CampaignReq>> getDoneCampaign(@RequestParam @NotNull String blogerId) {
+        return ResponseEntity.ok(blogerService.getDoneCampaign(blogerId));
+    }
+
     @PostMapping("/bloger/add/paid-campaign")
     public ResponseEntity<CampaignReq> addPaidCampaign(@RequestParam @NotNull String campaignId) {
         return ResponseEntity.ok(blogerService.addPaidCampaign(campaignId));
@@ -192,5 +197,25 @@ public class BlogerController {
     @GetMapping("/bloger/live-campaign")
     public ResponseEntity<ArrayList<CampaignReq>> getLiveCampaign(@RequestParam @NotNull String blogerId) {
         return ResponseEntity.ok(blogerService.getLiveCampaign(blogerId));
+    }
+
+    @GetMapping("/campaign/admin/paid-campaign")
+    public ResponseEntity<List<CampaignReq>> getPaidCampaignAdmin() {
+        return ResponseEntity.ok(blogerService.getPaidCampaignAdmin());
+    }
+
+    @GetMapping("/campaign/admin/live-campaign")
+    public ResponseEntity<List<CampaignReq>> getLiveCampaignAdmin() {
+        return ResponseEntity.ok(blogerService.getLiveCampaignAdmin());
+    }
+
+    @GetMapping("/campaign/admin/done-campaign")
+    public ResponseEntity<List<CampaignReq>> getDoneCampaignAdmin() {
+        return ResponseEntity.ok(blogerService.getDoneCampaignAdmin());
+    }
+
+    @GetMapping("/bloger/wallet")
+    public ResponseEntity<?> getWallet(@RequestParam @NotNull String blogerId) {
+        return ResponseEntity.ok(blogerService.getWallet(blogerId));
     }
 }

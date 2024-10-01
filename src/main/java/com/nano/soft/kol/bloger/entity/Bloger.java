@@ -62,6 +62,8 @@ public class Bloger extends AuditableBase implements UserDetails {
     private ArrayList<String> rejectedCampaign = new ArrayList<>();
     private ArrayList<String> doneCampaign = new ArrayList<>();
     private ArrayList<String> liveCampaign = new ArrayList<>();
+    private ArrayList<String> wallet = new ArrayList<>();
+
 
     @Schema(hidden = true)
     private String token;

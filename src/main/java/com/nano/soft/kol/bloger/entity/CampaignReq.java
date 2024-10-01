@@ -17,7 +17,6 @@ import nonapi.io.github.classgraph.json.Id;
 public class CampaignReq extends AuditableBase {
 
     @Id
-    @Schema(hidden = true)
     private String id;
 
     private String campaignDescription;
@@ -46,7 +45,7 @@ public class CampaignReq extends AuditableBase {
 
     private String campaignUrl = "";
 
-    private Boolean DoneFromBloger = false;
+    private Boolean doneFromBloger = false;
 
     private Boolean adminApprovalBlogerResponse = false;
 
